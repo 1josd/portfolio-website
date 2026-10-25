@@ -1,0 +1,1983 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Zhengye Liao</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Portfolio of Zhengye Liao, a product design student in Milan, with NEST, Vaporina, Majiroller, art projects and an archive of exercises.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..700&display=swap">
+<style>
+/* Layout: portfolio book, not slides. An index of projects opens the page;
+   each project is a spread: a sticky info column (4/12) beside a continuous 2px image flow (8/12)
+   where process notes sit in the grid as text cells next to their images.
+   Idea: technical objects, re-made for the hand. Hard grey grid, soft coloured objects. */
+:root {
+  --ink: #171414;
+  --ink-hover: #4a4a4a;
+  --paper: #ffffff;
+  --tile: #d8d8d8;
+  --white: #ffffff;
+  --muted: #646464;          /* 5.2:1 on paper */
+  --line: #cbcbcb;
+  --focus: #0900ff;
+
+  /* one family; 700 for loud titles and UI, 300 for narrative text */
+  --font: "Archivo", "Helvetica Neue", Arial, sans-serif;
+
+  --s2: 2px; --s4: 4px; --s8: 8px; --s12: 12px; --s16: 16px; --s20: 20px; --s24: 24px;
+  --s32: 32px; --s40: 40px; --s56: 56px; --s64: 64px; --s92: 92px; --s120: 120px;
+
+  --gutter-l: max(16px, env(safe-area-inset-left, 0px));
+  --gutter-r: max(16px, env(safe-area-inset-right, 0px));
+  --wall-r: max(2px, env(safe-area-inset-right, 0px));
+  --wall-l: max(2px, env(safe-area-inset-left, 0px));
+  --header: 52px;
+  /* the white band under each page's opening picture, holding its title: display line + 16px above and below */
+  --band: 136px;
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: calc(var(--header) + env(safe-area-inset-top, 0px)); }
+body {
+  margin: 0; background: var(--paper); color: var(--ink);
+  font-family: var(--font); font-weight: 700; font-size: 14px; line-height: 14px;
+  -webkit-font-smoothing: antialiased;
+}
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--paper); }
+img { display: block; max-width: 100%; }
+a { color: inherit; text-decoration: none; }
+a:hover { color: var(--ink-hover); }
+:focus-visible { outline: none; box-shadow: 0 0 0 2px var(--paper), 0 0 0 4px var(--focus); }
+h1, h2, h3, p, dl, dd, dt { margin: 0; font-weight: inherit; }
+h1, h2, h3 { text-wrap: balance; }
+.page { max-width: 1920px; margin: 0 auto; }
+
+/* ---------- type scale ---------- */
+.t-ui      { font-size: 14px; line-height: 14px; }
+.t-small   { font-size: 18px; line-height: 18px; letter-spacing: -1px; }
+.t-title   { font-size: 36px; line-height: 39px; letter-spacing: -1.2px; }
+.t-heading { font-size: 52px; line-height: 52px; letter-spacing: -2.2px; }
+.t-display { font-size: 112px; line-height: 104px; letter-spacing: -5.6px; }
+/* narrative text (quiet scale) */
+.q { font-weight: 300; font-size: 17px; line-height: 24px; letter-spacing: 0.1px; }
+.q-ui { font-weight: 300; font-size: 12px; line-height: 16px; }
+.q-h { font-weight: 300; font-size: 20px; line-height: 24px; }
+.lbl { font-size: 11px; line-height: 11px; letter-spacing: 0.4px; text-transform: uppercase; font-weight: 700; color: var(--muted); }
+/* loud blocks (intro, index, project head, archive, about) label in the loud ui role; quiet notes keep the quiet label */
+.intro .lbl, .orbit .lbl, .index-head, .info .top, .archive-head .lbl, .about .lbl { font-size: 14px; line-height: 14px; letter-spacing: normal; text-transform: lowercase; }
+.note .lbl, .h .lbl { font-weight: 300; }
+.muted { color: var(--muted); }
+.lc { text-transform: lowercase; }
+.num { font-variant-numeric: tabular-nums; }
+
+/* ---------- header ---------- */
+.header {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
+  height: var(--header); background: var(--paper); border-bottom: 2px solid var(--ink);
+  display: flex; align-items: center; justify-content: space-between; gap: var(--s16);
+  padding-left: var(--gutter-l); padding-right: var(--gutter-r);
+  text-transform: lowercase;
+}
+.header nav { display: flex; gap: var(--s24); text-transform: none; }
+/* the page you are on leads the menu in grey, once its title has flown up into it; on the first page Products has no
+   place in the menu and Art and Archive wait hidden until their names fly up from the Work frame */
+.header nav a { transition: color 0.6s; }
+/* the three words keep their order; the current page is only greyed */
+.header nav a.here { color: var(--muted); }
+.header nav a.gone { visibility: hidden; }
+.header nav a.away { visibility: hidden; }
+
+/* pages: one at a time; each opens on its picture full screen with its name bottom left, where the bubble left it */
+.view { display: none; }
+.view.on { display: block; }
+/* while the loader is up the Products page is laid out (not shown: the sheet covers it) so it opens ready */
+.view.warm, html.is-loading #products { display: block; }
+/* sections below the first screen are laid out only as they come near, so opening a page costs one screen of layout */
+.view > .project { content-visibility: auto; contain-intrinsic-size: auto 1600px; }
+/* Products is rendered in full, text and all, so nothing is laid out late when it opens */
+#products > .project { content-visibility: visible; }
+/* only the first screen fades in: fading the whole page made one huge layer that some browsers left unpainted (dark blocks) */
+.view.fade > :first-child { animation: vin 0.35s cubic-bezier(0.4, 0, 0.2, 1); }
+@keyframes vin { from { opacity: 0; } }
+.cover { position: relative; height: calc(100vh - var(--header) + var(--band)); height: calc(100svh - var(--header) + var(--band)); background: var(--paper); }
+/* the picture keeps the whole first screen; the white band with the title is added below it, never laid over it */
+.cover img { position: absolute; left: 0; top: 0; width: 100%; height: calc(100% - var(--band)); object-fit: cover; background: var(--tile); }
+/* the first project right under a cover starts at the band, as Products' index does; the 120px gap is for between projects */
+.cover + .project { margin-top: 0; }
+.cover h1 { position: absolute; left: var(--s16); bottom: var(--s16); z-index: 6; margin: 0; white-space: nowrap; transform-origin: 0 0; }
+/* a menu jump: the next page's picture swells out of the pressed word as a bubble, and the word grows into its title */
+.wipe { position: fixed; left: 0; right: 0; top: calc(var(--header) + env(safe-area-inset-top, 0px)); height: calc(100vh - var(--header)); height: calc(100svh - var(--header)); z-index: 4; overflow: hidden; background: var(--tile); pointer-events: none; }
+.wipe img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.wipe-word { position: fixed; left: 0; top: 0; z-index: 7; white-space: nowrap; transform-origin: 0 0; pointer-events: none; }
+.header a { display: inline-flex; align-items: center; min-height: 44px; }
+
+/* ---------- 12 col frame ---------- */
+.frame {
+  display: grid; grid-template-columns: repeat(12, 1fr); column-gap: var(--s16);
+  padding-left: var(--gutter-l); padding-right: var(--gutter-r);
+}
+
+/* ---------- intro ---------- */
+.intro { padding-block: var(--s40) var(--s64); row-gap: var(--s24); }
+.intro h1 { grid-column: 1 / 9; }
+.intro .bio { grid-column: 9 / 13; align-self: end; display: grid; gap: var(--s16); }
+.intro .bio p.q { max-width: 36ch; font-weight: 700; font-size: 18px; line-height: 18px; letter-spacing: -1px; }
+
+/* ---------- index ---------- */
+.index { border-top: 2px solid var(--ink); }
+.index-head { padding-block: var(--s12); }
+.index-head span:nth-child(1) { grid-column: 1 / 2; }
+.index-head span:nth-child(2) { grid-column: 2 / 7; }
+.index-head span:nth-child(3) { grid-column: 7 / 11; }
+.index-head span:nth-child(4) { grid-column: 11 / 13; text-align: right; }
+.row {
+  align-items: center; padding-block: var(--s8); border-top: 1px solid var(--line); min-height: 88px;
+}
+.row:last-child { border-bottom: 1px solid var(--line); }
+.row .n { grid-column: 1 / 2; }
+.row .name { grid-column: 2 / 7; display: flex; align-items: center; gap: var(--s16); }
+.row .thumb { width: 56px; height: 70px; flex: none; background: var(--tile); overflow: hidden; }
+.row .thumb img { width: 100%; height: 100%; object-fit: cover; }
+.row .what { grid-column: 7 / 11; font-weight: 700; font-size: 14px; line-height: 14px; color: var(--muted); }
+.row .yr { grid-column: 11 / 13; text-align: right; }
+a.row:hover .name { color: var(--ink-hover); }
+
+/* ---------- project spread ---------- */
+.project { margin-top: var(--s120); border-top: 2px solid var(--ink); }
+.spread { display: grid; grid-template-columns: repeat(12, 1fr); column-gap: var(--s16); padding-left: var(--gutter-l); padding-right: var(--wall-r); }
+.info {
+  grid-column: 1 / 5; align-self: start; position: sticky;
+  top: calc(var(--header) + env(safe-area-inset-top, 0px));
+  padding-block: var(--s16) var(--s40); display: grid; gap: var(--s24);
+}
+.info .top { display: flex; justify-content: space-between; gap: var(--s16); }
+.info .lede { max-width: 30ch; }
+.meta { display: grid; grid-template-columns: 96px 1fr; border-top: 1px solid var(--line); }
+.meta dt, .meta dd { padding-block: var(--s8); border-bottom: 1px solid var(--line); }
+.meta dt { font-size: 11px; line-height: 18px; letter-spacing: 0.4px; text-transform: uppercase; color: var(--muted); }
+.meta.q-ui { font-size: 13px; line-height: 18px; }
+@media (max-width: 639px) { .meta.q-ui { font-size: 14px; line-height: 20px; } .meta dt { line-height: 20px; } }
+.info .body { display: grid; gap: var(--s12); max-width: 40ch; }
+
+.flow { grid-column: 5 / 13; display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--s2); padding-top: var(--s2); min-width: 0; }
+.flow figure { margin: 0; min-width: 0; display: grid; align-content: start; gap: var(--s8); }
+.flow .ph { background: var(--tile); overflow: hidden; aspect-ratio: 4 / 5; }
+.flow .ph img { width: 100%; height: 100%; object-fit: cover; }
+.flow figcaption { padding: 0 var(--s8) var(--s12); }
+.flow .w { grid-column: 1 / -1; }
+.flow .w .ph { aspect-ratio: 3 / 2; }
+.flow .wide .ph { aspect-ratio: 16 / 9; }
+.flow .sq .ph { aspect-ratio: 1 / 1; }
+.flow .land .ph { aspect-ratio: 4 / 3; }
+.flow .white .ph { background: var(--white); }
+.flow .white .ph img { object-fit: contain; }
+.flow .nat .ph { aspect-ratio: auto; }
+.flow .nat .ph img { height: auto; }
+.flow .vid .ph { aspect-ratio: 2736 / 1728; }
+.flow .ph video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.flow .port .ph { aspect-ratio: 9 / 16; }
+.flow .tall { grid-row: span 2; }
+.flow .tall3 { grid-row: span 3; }
+.flow .wide-note { grid-column: 1 / -1; }
+.flow .wide-note .q { max-width: 60ch; }
+.flow .trio { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s2); }
+
+/* text cell inside the image flow */
+.note {
+  padding: var(--s16) var(--s16) var(--s16) var(--s8); display: grid; align-content: space-between; gap: var(--s24);
+  min-width: 0;
+}
+.note .h { display: grid; gap: var(--s12); }
+.note ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--s12) var(--s16); }
+.note li { display: grid; align-content: start; gap: var(--s4); border-top: 1px solid var(--line); padding-top: var(--s8); }
+.note.ol ul { grid-template-columns: 1fr; }
+
+/* ---------- archive ---------- */
+.archive-head { padding-block: var(--s16) var(--s24); }
+.archive-head h2 { grid-column: 1 / 5; }
+.archive-head p { grid-column: 5 / 13; align-self: end; }
+.wall { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--s2); padding-left: var(--wall-l); padding-right: var(--wall-r); }
+.wall figure { margin: 0; min-width: 0; display: grid; align-content: start; gap: var(--s8); }
+.wall .ph { background: var(--tile); overflow: hidden; aspect-ratio: 4 / 5; }
+.wall .ph img { width: 100%; height: 100%; object-fit: cover; }
+.wall figcaption { display: flex; justify-content: space-between; gap: var(--s8); padding: 0 var(--s8) var(--s16); }
+.wall .s2 { grid-column: span 2; }
+.wall .s2 .ph { aspect-ratio: 8 / 5; }
+/* a clip with strobe lights: still until the visitor asks for it, with a flashing-lights warning on the tile */
+.wall .ph video { width: 100%; height: 100%; object-fit: cover; object-position: 50% 65%; display: block; }
+.flash { position: relative; cursor: pointer; }
+.flash .warn { position: absolute; left: var(--s8); top: var(--s8); display: flex; align-items: center; gap: 6px; padding: 6px var(--s8); background: var(--ink); color: var(--paper); font-weight: 700; }
+.flash .warn svg { width: 14px; height: 14px; flex: none; }
+.flash .hint { position: absolute; left: var(--s8); bottom: var(--s8); padding: 6px var(--s8); background: var(--paper); color: var(--ink); transition: opacity .2s; }
+.flash .hint::after { content: "Hover to play"; }
+.flash.tap .hint::after { content: "Tap to play"; }
+.flash.on .hint { opacity: 0; }
+
+/* ---------- about + contact ---------- */
+.about { margin-top: var(--s120); border-top: 2px solid var(--ink); padding-block: var(--s16) var(--s92); row-gap: var(--s24); }
+.about .portrait { grid-column: 1 / 4; background: var(--tile); aspect-ratio: 4 / 5; overflow: hidden; }
+.about .portrait img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(1); }
+.about .txt { grid-column: 5 / 13; display: grid; align-content: space-between; gap: var(--s40); }
+.about .txt p.t-title { max-width: 24ch; }
+.contact-row { display: flex; gap: var(--s24); align-items: center; flex-wrap: wrap; }
+.mail { overflow-wrap: anywhere; user-select: all; }
+.btn {
+  font: inherit; color: var(--ink); background: transparent; border: 2px solid var(--ink); border-radius: 0;
+  min-height: 44px; padding: 0 var(--s20); cursor: pointer; text-transform: lowercase;
+  display: inline-flex; align-items: center;
+}
+.btn:hover { color: var(--ink-hover); border-color: var(--ink-hover); }
+.footer { display: flex; justify-content: space-between; gap: var(--s16); flex-wrap: wrap; border-top: 2px solid var(--ink);
+  padding-left: var(--gutter-l); padding-right: var(--gutter-r); padding-block: var(--s16) var(--s24); text-transform: lowercase; }
+
+/* 11. hand-drawn rules: script hides each straight border and draws one shaky pen line in its place */
+.hand-t { border-top-color: transparent !important; }
+.hand-b { border-bottom-color: transparent !important; }
+.hand-box { border-color: transparent !important; }
+.hand-u { text-decoration: none !important; }
+svg.hand { position: absolute; pointer-events: none; overflow: visible; z-index: 1; }
+svg.hand path { fill: currentColor; }
+
+/* ---------- motion ---------- */
+/* 1. pressable first screen: letters near the pointer widen and sink like pressed wax, then spring back */
+.press { touch-action: pan-y; }
+.press .word { white-space: nowrap; display: inline-block; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.press .ch {
+  display: inline-block; transform-origin: 50% 100%;
+  font-variation-settings: "wdth" var(--w, 100), "wght" var(--wg, 700);
+  transform: scaleY(var(--sy, 1));
+  transition: font-variation-settings 0.9s cubic-bezier(0.22, 1, 0.36, 1), transform 0.9s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.press .ch.hot { transition: font-variation-settings 0.12s linear, transform 0.12s linear; }
+/* 2. index hover preview that follows the pointer */
+.peek {
+  position: fixed; left: 0; top: 0; z-index: 6; width: 280px; aspect-ratio: 4 / 5; pointer-events: none;
+  background: var(--tile); overflow: hidden; opacity: 0; transition: opacity 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.peek.on { opacity: 1; }
+.peek img { width: 100%; height: 100%; object-fit: cover; }
+/* 3. hard-edge reveal, bottom up, for images below the first screen */
+.reveal { clip-path: inset(100% 0 0 0); }
+.reveal.in { clip-path: inset(0 0 0 0); transition: clip-path 0.6s cubic-bezier(0.22, 1, 0.36, 1); }
+/* 4. letter flicker keeps its box so the line never jumps */
+.sc { display: inline-block; white-space: nowrap; }
+@media (hover: none), (pointer: coarse) { .peek { display: none; } }
+
+/* 6. rotating keyword under each project title */
+.cycle { min-height: 52px; }
+@media (max-width: 639px) { .cycle { min-height: 36px; } }
+/* 7. materials ticker: a slow page turn between projects */
+.ticker { overflow: hidden; border-bottom: 1px solid var(--line); padding-block: var(--s12); white-space: nowrap; text-transform: lowercase; }
+.ticker .track { display: flex; width: max-content; animation: tick 30s linear infinite; }
+.ticker .run { display: flex; gap: var(--s16); padding-right: var(--s16); }
+.ticker .dot { color: var(--muted); }
+/* ticker words keep morphing: width and weight drift along Archivo's axes */
+.ticker .run > span:not(.dot) {
+  font-variation-settings: "wdth" 100, "wght" 700;
+}
+/* while its letters scramble a word keeps its width, and anything wider is cut at its edge rather than drawn over its neighbour */
+.ticker .run > span.busy { clip-path: inset(-50% -0.08em -50% -0.08em); }
+/* a little larger on a computer screen */
+@media (min-width: 1024px) { .ticker.t-small { font-size: 22px; line-height: 22px; letter-spacing: -1.2px; } }
+@keyframes tick { to { transform: translateX(calc(var(--shift, 50%) * -1)); } }
+
+/* 9. NEST word set: every line runs edge to edge with one even gap; script sets each word's width axis and place */
+.wordset { position: relative; padding: var(--s16); border-bottom: 1px solid var(--line); text-transform: lowercase; }
+.wordset span { position: absolute; left: 0; top: 0; white-space: nowrap; font-variation-settings: "wdth" 100, "wght" 700; }
+/* only while its letters scramble is a word cut at its box, widened by the negative letter-spacing so its own last letter stays whole */
+.wordset span.busy { clip-path: inset(-50% -0.08em -50% -0.08em); }
+.wordset span:nth-child(3n+2) { color: var(--muted); }
+.wordset .twin { visibility: hidden; }
+/* until the script has placed the words they stay hidden, so they never show stacked on one spot */
+.wordset:not(.ready) span { visibility: hidden; }
+@media (min-width: 1024px) { .wordset.t-heading { font-size: 60px; line-height: 60px; letter-spacing: -3.2px; } }
+@media (max-width: 639px) { .wordset.t-heading { font-size: 24px; line-height: 26px; letter-spacing: -0.8px; } }
+
+/* 10. opening orbit: three soft shapes circle the screen; scrolling grows "Product" until it fills the screen */
+/* the home page does not scroll: a short push plays the opening on its own clock */
+body[data-view="home"] .footer { display: none; }
+.orbit { position: relative; height: calc(100vh - var(--header)); height: calc(100svh - var(--header)); }
+.orbit .stage { position: sticky; top: var(--header); height: calc(100vh - var(--header)); height: calc(100svh - var(--header)); overflow: hidden; }
+.orbit .blob { position: absolute; left: 0; top: 0; display: block; overflow: hidden; background: var(--tile); will-change: transform, width, height, clip-path; }
+.orbit .blob img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.orbit .tag { position: fixed; left: 0; top: 0; z-index: 6; white-space: nowrap; pointer-events: none; transform-origin: 0 0; will-change: transform, opacity; }
+/* the first screen in type: name and bio bottom left */
+.orbit .lead { position: absolute; left: var(--s16); bottom: var(--s16); z-index: 1; display: grid; gap: var(--s16); max-width: 58%; will-change: opacity; }
+.orbit .lead .t-title { max-width: 30ch; }
+.xp { display: grid; gap: var(--s8); max-width: 760px; }
+.xp ol { list-style: none; margin: 0; padding: 0; }
+.xp li { display: grid; grid-template-columns: 88px 1.4fr 1fr; column-gap: var(--s24); row-gap: var(--s12); padding-block: var(--s8); border-top: 1px solid var(--line); }
+.xp li:last-child { border-bottom: 1px solid var(--line); }
+.xp .yr, .xp .role { color: var(--muted); }
+.xp .yr { white-space: nowrap; }
+@media (max-width: 639px) {
+  .xp li { grid-template-columns: 72px auto 1fr; } .xp .role { text-align: right; }
+  /* a long name wraps in the middle so the role can stay on the right */
+  .xp li.long { grid-template-columns: 72px 1fr auto; } .xp li.long .role { max-width: 9em; }
+  .xp li { line-height: 18px; column-gap: var(--s12); }
+}
+.orbit .reach { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--s12); margin-top: var(--s8); }
+.orbit .reach a { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+.orbit .reach a:hover { color: var(--ink-hover); }
+@media (max-width: 639px) { .orbit .reach a { display: inline-flex; align-items: center; min-height: 44px; } }
+/* "Work": a thin frame top right that keeps changing shape around the three bubbles */
+.orbit .work { position: absolute; right: var(--s16); top: var(--s32); width: min(380px, 28vw); height: min(320px, 40%); pointer-events: none; will-change: opacity; }
+.orbit .work svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.orbit .work path { fill: none; stroke: var(--ink); stroke-width: 1px; vector-effect: non-scaling-stroke; }
+.orbit .work-lbl { position: absolute; left: 50%; top: 0; transform: translate(-50%, -50%); padding: 0 var(--s8); background: var(--paper); }
+@media (max-width: 639px) {
+  .orbit .work { left: auto; width: 74%; top: var(--s24); height: 34%; }
+  .orbit .lead { right: var(--s16); max-width: none; }
+  }
+.xp-m { display: none; }
+/* scroll hint bottom right of the first screen: a word and an arrow that nods downward; pressing it opens Products */
+.orbit .down { position: absolute; right: var(--gutter-r); bottom: var(--s16); z-index: 2; display: inline-flex; align-items: center; gap: var(--s8);
+  min-height: 44px; padding: 0; border: 0; background: none; color: var(--ink); font: inherit; text-transform: lowercase; cursor: pointer; }
+.orbit .down:hover { color: var(--ink-hover); }
+.orbit .down svg { width: 14px; height: 20px; overflow: visible; animation: nod 1.6s cubic-bezier(0.65, 0, 0.35, 1) infinite; }
+.orbit .down path { fill: none; stroke: currentColor; stroke-width: 2px; stroke-linecap: square; }
+@keyframes nod { 50% { transform: translateY(5px); } }
+@media (prefers-reduced-motion: reduce) { .orbit .down svg { animation: none; } }
+/* on a phone the contact line runs to the right edge, so the hint is the arrow alone */
+@media (max-width: 639px) { .orbit .down span { display: none; } .orbit .down { min-width: 44px; justify-content: flex-end; } }
+@media (max-width: 639px) { .orbit .xp { display: none; } .about .xp-m { display: grid; } }
+.docs { display: flex; flex-wrap: wrap; gap: var(--s8) var(--s16); }
+.docs a { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+@media (max-width: 639px) { .docs a { display: inline-flex; align-items: center; min-height: 44px; } }
+.orbit .blob:focus-visible { outline: 4px solid var(--focus); outline-offset: -4px; }
+
+/* loader: one paper sheet with a count, lifted off bottom up once the first screens are in */
+.loader { position: fixed; inset: 0; z-index: 50; background: var(--paper); display: flex; flex-direction: column;
+  padding: calc(var(--s16) + env(safe-area-inset-top, 0px)) var(--gutter-r) calc(var(--s16) + env(safe-area-inset-bottom, 0px)) var(--gutter-l);
+  clip-path: inset(0 0 0 0); }
+.loader .lbl { font-size: 14px; line-height: 14px; letter-spacing: normal; text-transform: lowercase; }
+.loader-foot { margin-top: auto; display: flex; justify-content: space-between; align-items: flex-end; gap: var(--s16); }
+.loader-n { font-variant-numeric: tabular-nums; }
+/* on a phone "100%" and "Loading" share one line, so both scale with the screen width */
+@media (max-width: 767px) { .loader-foot .t-display { font-size: min(60px, 13.5vw); line-height: 0.95; letter-spacing: -0.045em; } }
+.loader-bar { position: absolute; left: 0; right: 0; bottom: 0; height: 4px; background: var(--ink); transform: scaleX(0); transform-origin: 0 50%; }
+
+.loader.out { clip-path: inset(0 0 100% 0); transition: clip-path 0.6s cubic-bezier(0.22, 1, 0.36, 1); pointer-events: none; }
+html.is-loading { overflow: hidden; }
+@media (prefers-reduced-motion: reduce) { .loader.out { transition: none; } }
+img.pending { opacity: 0; }
+img.loaded { opacity: 1; transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+
+/* ---------- tablet ---------- */
+@media (max-width: 1023px) {
+  .info { grid-column: 1 / 6; }
+  .flow { grid-column: 6 / 13; }
+}
+/* ---------- mobile ---------- */
+@media (max-width: 767px) {
+  :root { --band: 88px; }
+  .t-title   { font-size: 24px; line-height: 26px; letter-spacing: -0.8px; }
+  .t-heading { font-size: 36px; line-height: 36px; letter-spacing: -1.2px; }
+  .t-display { font-size: 60px; line-height: 56px; letter-spacing: -2.8px; }
+  .header nav { gap: var(--s16); }
+  .header .hide-s { display: none; }
+  .contact-row .btn, .contact-row a { display: inline-flex; align-items: center; min-height: 44px; }
+  .frame, .spread { grid-template-columns: repeat(2, 1fr); column-gap: var(--s12); }
+  .intro { padding-block: var(--s32) var(--s40); }
+  .intro h1, .intro .bio { grid-column: 1 / -1; }
+  .index-head span:nth-child(3) { display: none; }
+  .index-head span:nth-child(1) { grid-column: 1 / 2; }
+  .index-head span:nth-child(2) { display: none; }
+  .index-head span:nth-child(4) { grid-column: 2 / 3; }
+  .row { row-gap: var(--s8); padding-block: var(--s12); }
+  .row .n { grid-column: 1 / 2; grid-row: 1; }
+  .row .yr { grid-column: 2 / 3; grid-row: 1; text-align: right; }
+  .row .name { grid-column: 1 / -1; }
+  .row .what { grid-column: 1 / -1; }
+  .project { margin-top: var(--s92); }
+  .spread { padding-right: var(--wall-r); }
+  .info { grid-column: 1 / -1; position: static; padding-right: var(--s16); }
+  .flow { grid-column: 1 / -1; margin-left: calc(var(--gutter-l) * -1 + var(--wall-l)); }
+  .flow { grid-auto-flow: row dense; }
+  .flow .note { grid-column: 1 / -1; padding-inline: var(--s16); }
+  /* a picture left without a partner once the notes go full width takes the whole row */
+  .flow .solo { grid-column: 1 / -1; }
+  .flow .tall, .flow .tall3 { grid-row: auto; }
+  .archive-head h2, .archive-head p { grid-column: 1 / -1; }
+  .archive-head p { margin-top: var(--s12); }
+  .wall { grid-template-columns: repeat(2, 1fr); }
+  .wall figcaption { flex-direction: column; gap: 2px; }
+  .about .portrait { grid-column: 1 / 2; }
+  .about .txt { grid-column: 1 / -1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  img.loaded { transition: none; }
+  .reveal { clip-path: none; }
+  .press .ch { transition: none; }
+  .ticker .track { animation: none; }
+}
+</style>
+
+<!-- loader: holds the first screen until the face and the first pictures are in, at most a few seconds -->
+<div class="loader" id="loader" role="status" aria-live="polite">
+  <div class="loader-foot">
+    <span class="loader-n t-display num" aria-hidden="true">0%</span>
+    <span class="loader-w t-display" aria-hidden="true">Loading</span>
+  </div>
+  <i class="loader-bar" aria-hidden="true"></i>
+  <span class="sr" id="loader-sr">Loading</span>
+</div>
+<script>
+(function () {
+  var el = document.getElementById('loader'), num = el.querySelector('.loader-n'), bar = el.querySelector('.loader-bar'), shown = 0, target = 0, done = false;
+  var calm = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches, t0 = Date.now();
+  document.documentElement.classList.add('is-loading');
+  /* every visit opens on the home page at the top: no page left over in the address, no scroll the browser restores */
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+  if (location.hash) history.replaceState(null, '', location.pathname + location.search);
+  window.scrollTo(0, 0);
+  /* the counter eases toward the real share loaded, so it never jumps or stalls at a round number */
+  function tick() {
+    shown += (target - shown) * (calm ? 1 : 0.18);
+    if (target - shown < 0.5) shown = target;
+    num.textContent = Math.round(shown) + '%';
+    bar.style.transform = 'scaleX(' + (shown / 100).toFixed(3) + ')';
+    if (done && shown >= 100) return finish();
+    requestAnimationFrame(tick);
+  }
+  function finish() {
+    /* a short hold so a fast load still reads as a beat, then the sheet lifts off bottom up */
+    setTimeout(function () {
+      window.scrollTo(0, 0);
+      var prod = document.getElementById('products'); if (prod) prod.classList.remove('warm');
+      document.documentElement.classList.remove('is-loading');
+      el.classList.add('out');
+      document.getElementById('loader-sr').textContent = 'Loaded';
+      setTimeout(function () { el.remove(); }, calm ? 0 : 700);
+    }, Math.max(0, 500 - (Date.now() - t0)));
+  }
+  /* what the first screens need: the Archivo face, the three bubbles and the three page covers; videos and pictures
+     further down keep loading lazily, so a visitor never waits for tens of megabytes */
+  function start() {
+    var jobs = [], n = 0, total;
+    Array.prototype.forEach.call(document.querySelectorAll('img:not([loading="lazy"])'), function (img) {
+      if (!img.getAttribute('src')) return;
+      jobs.push(img.complete ? Promise.resolve() : new Promise(function (r) { img.addEventListener('load', r, { once: true }); img.addEventListener('error', r, { once: true }); }));
+    });
+    /* the Products page too: every picture is fetched and decoded, and the page is laid out once behind the sheet
+       (its word set fitted, its grid placed), so opening it after the first screen costs nothing */
+    var prod = document.getElementById('products');
+    if (prod) {
+      prod.classList.add('warm');
+      Array.prototype.forEach.call(prod.querySelectorAll('img[src]'), function (img) {
+        var pre = new Image(); pre.decoding = 'async'; pre.src = img.getAttribute('src');
+        jobs.push((pre.decode ? pre.decode() : new Promise(function (r) { pre.onload = pre.onerror = r; })).catch(function () {}));
+      });
+    }
+    if (document.fonts && document.fonts.load) jobs.push(Promise.all([document.fonts.load('700 52px Archivo'), document.fonts.load('300 16px Archivo')]).catch(function () {}));
+    total = jobs.length || 1;
+    jobs.forEach(function (j) { j.then(function () { n++; target = Math.max(target, n / total * 100); }); });
+    Promise.all(jobs).then(function () { target = 100; done = true; });
+  }
+  /* never hold anyone longer than this, whatever is still on its way */
+  setTimeout(function () { target = 100; done = true; }, 8000);
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
+  requestAnimationFrame(tick);
+})();
+</script>
+<div class="page">
+<header class="header t-ui">
+  <a href="#top">zhengye liao</a>
+  <nav aria-label="Sections">
+    <a data-nav="products" href="#products">Product</a>
+    <a data-nav="art" href="#art">Art</a>
+    <a data-nav="archive" href="#archive">Archive</a>
+  </nav>
+</header>
+
+<main id="top">
+<!-- home: the first screen in type, the work in a small frame; scrolling opens Products, a pressed bubble opens its own page -->
+<div class="view" data-view="home">
+  <section class="orbit" aria-label="Introduction and work">
+    <div class="stage">
+      <!-- first screen is set in type; the work sits in a small frame top right -->
+      <div class="lead">
+        <span class="lbl">Product designer · Milan</span>
+        <p class="t-display">Zhengye Liao</p>
+        <p class="t-title">My work focuses on the balance between art and function, from everyday objects to products for special uses.<br>I am based in Milan and studying at Politecnico di Milano.</p>
+      <div class="xp">
+        <span class="lbl">Experience</span>
+        <ol class="t-ui">
+          <li class="long"><span class="yr">2023–Now</span><span class="org">Politecnico di Milano</span><span class="role">BSc Product Design</span></li>
+          <li><span class="yr">2025</span><span class="org">Artopia Gallery</span><span class="role">Intern</span></li>
+          <li class="long"><span class="yr">2026</span><span class="org">Staatliche Akademie der Bildenden Künste Stuttgart</span><span class="role">Exchange, Industrial Design</span></li>
+          <li class="long"><span class="yr">2023–Now</span><span class="org">Tempio Del Futuro Perduto*</span><span class="role">Promoter, Resident Artist</span></li>
+        </ol>
+      </div>
+        <p class="reach t-small"><span class="lbl">Contact</span> <a href="mailto:Zhengye.Liao@mail.polimi.it">Zhengye.Liao@mail.polimi.it</a></p>
+      </div>
+      <div class="work" aria-hidden="true"><svg><path></path></svg><span class="work-lbl t-small">Work</span></div>
+      <button class="down t-ui" type="button" aria-label="Scroll to Product"><span>Scroll</span><svg viewBox="0 0 14 20" aria-hidden="true"><path d="M7 1v17M1 12l6 6 6-6"/></svg></button>
+      <a class="blob" href="#art" data-k="art"><img decoding="async" src="img/sp-red.jpg" alt="Art: red spiral study"></a>
+      <a class="blob" href="#products" data-k="product"><img decoding="async" src="img/n2-3.jpg?v=2" alt="Product: NEST charger"></a>
+      <a class="blob" href="#archive" data-k="archive"><img decoding="async" src="img/tr-badges-cover.jpg" alt="Archive: Tempio Record badges"></a>
+      <span class="tag t-display" aria-hidden="true">Art</span>
+      <span class="tag t-display" aria-hidden="true">Product</span>
+      <span class="tag t-display" aria-hidden="true">Archive</span>
+    </div>
+  </section>
+
+</div>
+
+<div class="view" id="products" data-view="products">
+  <section class="cover" aria-label="Product">
+    <img decoding="async" src="img/n2-3.jpg?v=2" alt="">
+    <h1 class="t-display">Product</h1>
+  </section>
+
+  <!-- index: first thing after the name, like the contents page of a book -->
+  <section id="index" class="index press" aria-label="Index">
+    <div class="frame index-head lbl"><span>No.</span><span>Project</span><span>Type</span><span>Year</span></div>
+    <div>
+      <a data-preview="img/n2-43.jpg?v=2" class="frame row" href="#nest">
+        <span class="n t-ui num">01</span>
+        <span class="name t-title"><span class="thumb"><img loading="lazy" decoding="async" src="img/n2-15.jpg?v=2" alt="" width="1600" height="1195"></span><span class="sc">NEST</span></span>
+        <span class="what q-ui">Shapeable MagSafe charger, wax and textile</span>
+        <span class="yr t-ui num">2026</span>
+      </a>
+      <a data-preview="img/bal-renders-alessi.jpg" class="frame row" href="#vaporina">
+        <span class="n t-ui num">02</span>
+        <span class="name t-title"><span class="thumb"><img loading="lazy" decoding="async" src="img/bal2-tower.jpg" alt="" width="1200" height="1600"></span><span class="sc">Vaporina</span></span>
+        <span class="what q-ui">Steam accessory for Alessi</span>
+        <span class="yr t-ui num">2025</span>
+      </a>
+      <a data-preview="img/maji-kids.jpg" class="frame row" href="#majiroller">
+        <span class="n t-ui num">03</span>
+        <span class="name t-title"><span class="thumb"><img loading="lazy" decoding="async" src="img/maji-d4.jpg" alt="" width="1600" height="900"></span><span class="sc">Majiroller</span></span>
+        <span class="what q-ui">Water roller for two children</span>
+        <span class="yr t-ui num">2025</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- 01 NEST -->
+  <article id="nest" class="project" aria-label="NEST">
+    <div class="wordset t-heading" aria-hidden="true"><span>Soft</span><span>Microcrystalline wax</span><span>Warmth</span><span>Textile skin</span><span>Shaped by hand</span><span>MagSafe</span><span>Pressure</span><span>Refill</span><span>Nest</span><span>Body</span><span>Heat</span><span>Hold</span></div>
+    <div class="spread">
+      <aside class="info">
+        <div class="top lbl"><span>01</span><span>ABK Stuttgart · Summer 2026</span></div>
+        <h2 class="t-heading">NEST</h2>
+        <p class="t-heading muted">Shapeable Charger</p>
+        <p class="lede q-h">A MagSafe phone charger filled with wax, which you press into shape by hand.</p>
+        <dl class="meta q-ui">
+          <dt>Year</dt><dd>2026</dd>
+          <dt>Course</dt><dd>Refill: Designing Energy Rituals, ABK Stuttgart</dd>
+          <dt>Type</dt><dd>Product, material research</dd>
+          <dt>Material</dt><dd>Wax and mineral oil core, two-way stretch knit, PLA ring, Apple-certified MagSafe module</dd>
+          <dt>Size</dt><dd>105 × 100 × 68 mm, 340 g</dd>
+          <dt>Work</dt><dd>Research, sketching, material tests, prototyping, photography</dd>
+        </dl>
+        <div class="body"><p class="q">NEST is a charger for a bedside table or a desk. Its core is wax under a knitted cover, so it takes the shape you press into it and then holds the phone at that angle. A MagSafe module, Apple’s magnetic wireless charger for iPhone, sits in a plastic ring on top.</p></div>
+        <p class="docs q-ui"><a href="docs/NEST-Project-Documentation.pdf" target="_blank" rel="noopener">Project documentation (PDF)</a><a href="docs/NEST-Technical-Document.pdf" target="_blank" rel="noopener">Technical document (PDF)</a></p>
+      </aside>
+      <div class="flow">
+        <figure class="w land"><div class="ph"><img loading="lazy" decoding="async" src="img/n2-13.jpg?v=2" alt="A phone resting flat on NEST" width="2400" height="1792"></div></figure>
+        <div class="note wide-note">
+          <div class="h"><span class="lbl">Background and goal</span><p class="q-h">You usually check charging on a screen, but charging also makes heat you can feel.</p></div>
+          <p class="q">Phones and chargers show charging with numbers, icons and small status lights, so you have to look to know. Heat is different, because you can notice it with your hand without looking. The project set out to make a charger you understand by touch, and it had four goals.</p>
+          <ul class="q-ui">
+            <li><span>Approachable</span><span class="muted">It has no lights and no numbers.</span></li>
+            <li><span>Tactile</span><span class="muted">The surface is soft fabric.</span></li>
+            <li><span>Intuitive</span><span class="muted">You adjust it by pressing, not through settings.</span></li>
+            <li><span>Personal</span><span class="muted">It keeps the shape you give it.</span></li>
+          </ul>
+        </div>
+        <figure class="land"><div class="ph"><img loading="lazy" decoding="async" src="img/n2-41.jpg?v=2" alt="A hand lowering a phone onto NEST" width="1600" height="1195"></div></figure>
+        <figure class="land"><div class="ph"><img loading="lazy" decoding="async" src="img/n2-44.jpg?v=2" alt="A phone slid onto NEST from the side" width="1600" height="1195"></div></figure>
+        <figure class="w land"><div class="ph"><img loading="lazy" decoding="async" src="img/n2-process.jpg" alt="Prototypes laid out: printed rings, knit and fabric skins, a charging coil and paper templates" width="1448" height="1086"></div><figcaption class="q-ui muted">Process · rings, skins and cores</figcaption></figure>
+        <div class="note">
+          <div class="h"><span class="lbl">Process</span><p class="q-h">Wax was chosen for the core after several skins and fillings were tested.</p></div>
+          <p class="q">The tests for the outer skin covered latex, TPU (a flexible plastic), silicone and knitted fabric. The tests for the filling covered magnetic beads, steel balls, a thick liquid and wax. Wax gives way when you press it and then stays put under the weight of a phone. The final core is 250 g of microcrystalline wax mixed with 30 g of mineral oil, sealed in a film bag and covered with a two-way stretch knit. A rigid PLA ring on top holds the MagSafe module, and the USB-C port is set into the side of the ring.</p>
+        </div>
+        <figure class="land"><div class="ph"><img loading="lazy" decoding="async" src="img/n2-43.jpg?v=2" alt="A thumb pressing into NEST" width="1600" height="1195"></div></figure>
+        <figure class="land"><div class="ph"><img loading="lazy" decoding="async" src="img/n2-47.jpg?v=2" alt="Two hands shaping NEST" width="1600" height="1195"></div></figure>
+        <figure class="land"><div class="ph"><img loading="lazy" decoding="async" src="img/n2-42.jpg?v=2" alt="NEST tipped back in one hand" width="1600" height="1142"></div></figure>
+        <div class="note wide-note">
+          <div class="h"><span class="lbl">Product</span><p class="q-h">You press the phone to the angle you want, and NEST keeps it there.</p></div>
+          <p class="q">This works at room temperature, so the phone can lie almost flat or lean up towards you. While it charges, NEST gets slightly warm. That warmth is the only sign that it is working, because the charger has no light and no screen.</p>
+        </div>
+        <figure class="land"><div class="ph"><img loading="lazy" decoding="async" src="img/n2-3.jpg?v=2" alt="NEST from the front, with its USB-C port" width="1600" height="1195"></div><figcaption class="q-ui muted">Front · USB-C in the side of the ring</figcaption></figure>
+        <figure class="land"><div class="ph"><img loading="lazy" decoding="async" src="img/n2-6.jpg?v=2" alt="NEST from above, a rigid ring set into blue textile" width="1600" height="1195"></div><figcaption class="q-ui muted">Top · rigid MagSafe ring</figcaption></figure>
+        <figure class="w wide"><div class="ph"><img loading="lazy" decoding="async" src="img/n2-34.jpg?v=2" alt="Two hands pressing NEST on a wooden table" width="2400" height="1350"></div><figcaption class="q-ui muted">Pressed into shape on the table</figcaption></figure>
+        <figure class="land"><div class="ph"><img loading="lazy" decoding="async" src="img/n2-27.jpg?v=2" alt="NEST from behind, cable leaving the ring, phone leaning on it" width="1600" height="1195"></div><figcaption class="q-ui muted">From behind · cable from the ring</figcaption></figure>
+        <figure class="land"><div class="ph"><img loading="lazy" decoding="async" src="img/n2-18.jpg?v=2" alt="A phone lying flat on NEST" width="1600" height="1195"></div><figcaption class="q-ui muted">Phone lying flat</figcaption></figure>
+        <figure class="land"><div class="ph"><img loading="lazy" decoding="async" src="img/n2-21.jpg?v=2" alt="A phone tilted back on NEST" width="1600" height="1195"></div><figcaption class="q-ui muted">Phone tilted back</figcaption></figure>
+        <figure class="land"><div class="ph"><img loading="lazy" decoding="async" src="img/n2-26.jpg?v=2" alt="NEST charging a phone through its USB-C cable" width="1600" height="1195"></div><figcaption class="q-ui muted">Plugged into the ring</figcaption></figure>
+        <figure class="w land"><div class="ph"><img loading="lazy" decoding="async" src="img/n2-23.jpg?v=2" alt="A fingertip settling the phone on NEST" width="1600" height="1114"></div></figure>
+        <figure class="w wide"><div class="ph"><img loading="lazy" decoding="async" src="img/n2-39.jpg?v=2" alt="A hand setting a phone onto NEST on a wooden table" width="2400" height="1350"></div></figure>
+        <figure class=""><div class="ph"><img loading="lazy" decoding="async" src="img/n2-36.jpg?v=2" alt="NEST cupped in a palm above a wooden table" width="1200" height="1600"></div></figure>
+        <figure class=""><div class="ph"><img loading="lazy" decoding="async" src="img/n2-mark.jpg?v=2" alt="A hand pressing a phone down onto NEST" width="1200" height="1801"></div></figure>
+      </div>
+    </div>
+  </article>
+
+  <!-- 02 Vaporina -->
+  <article id="vaporina" class="project" aria-label="Vaporina">
+    <div class="ticker t-small" aria-hidden="true"><div class="track"><div class="run"><span>Stainless steel</span><span class="dot">·</span> <span>Silicone</span><span class="dot">·</span> <span>Steam</span><span class="dot">·</span> <span>Alessi</span><span class="dot">·</span> <span>2025</span><span class="dot">·</span></div><div class="run"><span>Stainless steel</span><span class="dot">·</span> <span>Silicone</span><span class="dot">·</span> <span>Steam</span><span class="dot">·</span> <span>Alessi</span><span class="dot">·</span> <span>2025</span><span class="dot">·</span></div></div></div>
+    <div class="spread">
+      <aside class="info">
+        <div class="top lbl"><span>02</span><span>Alessi x Polimi · 2025</span></div>
+        <h2 class="t-heading">Vaporina</h2>
+        <p class="t-heading muted">Steam Accessory</p>
+        <p class="lede q-h">A steaming insert that lets one pot boil one dish and steam another at the same time.</p>
+        <dl class="meta q-ui">
+          <dt>Year</dt><dd>2025</dd>
+          <dt>Client</dt><dd>Alessi (course brief)</dd>
+          <dt>Course</dt><dd>Laboratorio di Fondamenti del Progetto, Politecnico di Milano</dd>
+          <dt>Material</dt><dd>Stainless steel, silicone</dd>
+          <dt>Work</dt><dd>Concept, paper prototypes, renders, final prototype, user book</dd>
+        </dl>
+        <div class="body"><p class="q">Vaporina is a stack of stainless steel steaming trays, designed for an Alessi course brief. It sits on a pot of boiling water and is covered by a wavy lid called the “Skirt”.</p></div>
+      </aside>
+      <div class="flow">
+        <figure><div class="ph"><img loading="lazy" decoding="async" src="img/bal2-tower.jpg" alt="Vaporina assembled: two steel trays under the yellow “Skirt” lid, dancer handle on top" width="1086" height="1448"></div></figure>
+        <figure><div class="ph"><img loading="lazy" decoding="async" src="img/bal2-lid.jpg?v=2" alt="The “Skirt” lid resting on top of the tower" width="1086" height="1448"></div></figure>
+        <div class="note wide-note">
+          <div class="h"><span class="lbl">Background and goal</span><p class="q-h">Alessi’s brief asked for ways to use less energy when cooking.</p></div>
+          <p class="q">When water boils on the stove, most of its steam escapes and that heat is lost. Vaporina puts the steam to use: the water at the bottom of the pot cooks one dish, and the trays above it steam a second dish on the same burner. A second goal was that the stack should look good enough to serve from, so the food does not need to move to another dish.</p>
+        </div>
+        <figure class="w land"><div class="ph"><img loading="lazy" decoding="async" src="img/bal-process.jpg" alt="Workbench with paper prototypes of the trays and modelling tools" width="2000" height="1500"></div><figcaption class="q-ui muted">Process · paper prototypes</figcaption></figure>
+        <div class="note wide-note">
+          <div class="h"><span class="lbl">Process</span><p class="q-h">The trays, the lid and the handle were first made in paper.</p></div>
+          <p class="q">After the paper prototypes, the design was modelled in 3D and rendered in a range of colours.</p>
+        </div>
+        <figure class="w"><div class="ph"><img loading="lazy" decoding="async" src="img/bal-renders-alessi.jpg" alt="Renders in three colours on a pink background, with the Alessi logo" width="1600" height="1000"></div><figcaption class="q-ui muted">Renders in three colours</figcaption></figure>
+        <div class="note wide-note">
+          <div class="h"><span class="lbl">Product</span><p class="q-h">One Vaporina fits several pot sizes and lifts out in one piece.</p></div>
+          <p class="q">The wavy edge of the “Skirt” sits on pots of the standard diameters. The dancer-shaped handle on top lifts the trays and the lid out together.</p>
+        </div>
+        <figure><div class="ph"><img loading="lazy" decoding="async" src="img/bal2-lift.jpg?v=2" alt="Two hands lifting the “Skirt” lid off the tower" width="1086" height="1448"></div></figure>
+        <figure><div class="ph"><img loading="lazy" decoding="async" src="img/bal2-hands.jpg" alt="Two hands setting the “Skirt” lid onto the tower" width="1086" height="1448"></div><figcaption class="q-ui muted">Putting the “Skirt” on</figcaption></figure>
+        <figure><div class="ph"><img loading="lazy" decoding="async" src="img/bal2-tray.jpg" alt="The yellow-rimmed “Skirt” lid on its own" width="1086" height="1448"></div></figure>
+        <figure><div class="ph"><img loading="lazy" decoding="async" src="img/bal2-parts.jpg?v=2" alt="The parts laid out: two trays and the “Skirt” lid" width="1086" height="1448"></div><figcaption class="q-ui muted">Parts</figcaption></figure>
+        <figure><div class="ph"><img loading="lazy" decoding="async" src="img/bal-pots.jpg" alt="Vaporina in an Alessi pot among steel cookware" width="1279" height="1600"></div></figure>
+        <figure><div class="ph"><img loading="lazy" decoding="async" src="img/bal2-table.jpg" alt="Vaporina served on a dinner table" width="1178" height="1335"></div><figcaption class="q-ui muted">From pot to table</figcaption></figure>
+        <figure class="w white nat"><div class="ph"><img loading="lazy" decoding="async" src="img/bal-steps.jpg" alt="Eight-step illustrated user instructions, a page from the user book" width="1600" height="865"></div></figure>
+        <figure class="w wide"><div class="ph"><img loading="lazy" decoding="async" src="img/bal-book.jpg" alt="User book on a red background" width="1274" height="889"></div><figcaption class="q-ui muted">User book: Cucina al vapore con Vaporina</figcaption></figure>
+      </div>
+    </div>
+  </article>
+
+  <!-- 03 Majiroller -->
+  <article id="majiroller" class="project" aria-label="Majiroller">
+    <div class="spread">
+      <aside class="info">
+        <div class="top lbl"><span>03</span><span>Polimi 2025</span></div>
+        <h2 class="t-heading">Majiroller</h2>
+        <p class="t-heading muted">Water Roller</p>
+        <p class="lede q-h">A water roller that two children can pull together.</p>
+        <dl class="meta q-ui">
+          <dt>Year</dt><dd>2025</dd>
+          <dt>Course</dt><dd>Laboratorio di Design del Prodotto Industriale, Sez. 1, Politecnico di Milano</dd>
+          <dt>Focus</dt><dd>Recycled tyres, low cost, durability</dd>
+          <dt>Material</dt><dd>50 L rotomoulded HDPE drum, bent steel tube handles, recycled tyres</dd>
+          <dt>Work</dt><dd>Concept, 3D, renders</dd>
+        </dl>
+        <div class="body"><p class="q">Majiroller is a 50-litre water drum that rolls on two recycled tyres, designed for use in the Democratic Republic of the Congo (DRC). It has two long steel handles, shaped for two children to hold.</p></div>
+      </aside>
+      <div class="flow">
+        <figure class="w white"><div class="ph"><img loading="lazy" decoding="async" src="img/maji-hero.jpg" alt="Majiroller with its two long steel handles" width="1600" height="900"></div></figure>
+        <div class="note">
+          <div class="h"><span class="lbl">Background and goal</span><p class="q-h">In the DRC, most water is still carried home by hand.</p></div>
+          <p class="q">People carry it in buckets of 15 to 25 kg, often for half an hour or more over mud and sand, and children often do this work. These figures come from the research annex of the course project. The goal was a roller that lets two children share one load and that costs as little as possible to make.</p>
+        </div>
+        <figure><div class="ph"><img loading="lazy" decoding="async" src="img/maji-kids.jpg" alt="Two children pulling a water roller across sand" width="1024" height="768"></div><figcaption class="q-ui muted">Two children pulling a water roller</figcaption></figure>
+        <div class="note wide-note">
+          <div class="h"><span class="lbl">Process</span><p class="q-h">The roller is made from three kinds of parts.</p></div>
+          <p class="q">To keep the cost down, it uses a rotomoulded HDPE drum (a seamless plastic tank, the kind used for storing water), two recycled tyres and handles bent from steel tube. The fixings between these parts were worked out in 3D.</p>
+        </div>
+        <figure class="w wide white"><div class="ph"><img loading="lazy" decoding="async" src="img/maji-parts.jpg" alt="Exploded view of drum, tyres and handles" width="1600" height="900"></div><figcaption class="q-ui muted">Parts: drum, tyres, two handles</figcaption></figure>
+        <figure class="sq"><div class="ph"><img loading="lazy" decoding="async" src="img/maji-d1.jpg" alt="Detail of drum and tyre" width="1600" height="900"></div></figure>
+        <figure class="sq"><div class="ph"><img loading="lazy" decoding="async" src="img/maji-d3.jpg" alt="Detail of the handle fixing" width="1600" height="900"></div></figure>
+        <div class="note wide-note">
+          <div class="h"><span class="lbl">Product</span><p class="q-h">Two children pull the 50 kg of water instead of carrying it.</p></div>
+          <p class="q">Each child pulls one handle, and the drum rolls between the two tyres over sand and stone. Reusing old tyres is the main idea of the design, because it keeps the cost low.</p>
+        </div>
+        <figure class="wide"><div class="ph"><img loading="lazy" decoding="async" src="img/mr-bip51.jpg" alt="Drum cap and patterned side panel" width="1703" height="958"></div></figure>
+        <figure class="wide"><div class="ph"><img loading="lazy" decoding="async" src="img/mr-bip69.jpg" alt="Handle straps wrapped around the drum between two tyres" width="1703" height="958"></div></figure>
+        <figure class="w wide"><div class="ph"><img loading="lazy" decoding="async" src="img/mr-bip53.jpg" alt="Tyre and side panel with the fill cap" width="1703" height="958"></div></figure>
+        <figure class="w wide"><div class="ph"><img loading="lazy" decoding="async" src="img/maji-d4.jpg" alt="Handles meeting the drum between two tyres" width="1600" height="900"></div></figure>
+      </div>
+    </div>
+  </article>
+
+</div>
+
+<div class="view" id="art" data-view="art">
+  <section class="cover" aria-label="Art">
+    <img decoding="async" src="img/sp-red.jpg" alt="">
+    <h1 class="t-display">Art</h1>
+  </section>
+
+  <!-- 04 Field: real-time generative visuals -->
+  <article id="field" class="project" aria-label="Field">
+    <div class="wordset t-heading" aria-hidden="true"><span>Noise</span><span>Domain warp</span><span>Flow</span><span>Field</span><span>Shader</span><span>OKLCH</span><span>Grain</span><span>Time</span><span>Colour lookup</span><span>Surface</span><span>Drift</span><span>Signal</span></div>
+    <div class="spread">
+      <aside class="info">
+        <div class="top lbl"><span>Art</span><span>WebGL · 2026</span></div>
+        <h2 class="t-heading">Field</h2>
+        <p class="t-heading muted">Generative Visuals</p>
+        <p class="lede q-h">Moving images that a program generates live in the browser, written with WebGL 2.0 and GLSL shaders.</p>
+        <dl class="meta q-ui">
+          <dt>Year</dt><dd>2026</dd>
+          <dt>Type</dt><dd>Real-time generative visuals</dd>
+          <dt>Tools</dt><dd>WebGL 2.0, GLSL</dd>
+          <dt>Method</dt><dd>fBm noise, domain warping, OKLCH colour lookup</dd>
+        </dl>
+      </aside>
+      <div class="flow">
+        <figure class="w vid"><div class="ph"><video muted loop playsinline preload="none" poster="video/rec-1927.jpg" src="video/rec-1927.mp4" aria-label="Pearl field, high warp"></video></div></figure>
+        <div class="note">
+          <div class="h"><span class="lbl">Field</span><p class="q-h">The image starts from layered noise that is bent and set in motion.</p></div>
+          <p class="q">WebGL lets a web page draw with the graphics card, and a shader is a small program that works out the colour of every pixel. Field is built from four steps.</p>
+          <ul class="q-ui">
+            <li><span>fBm</span><span class="muted">Layers of random noise at different scales are added together (fractal Brownian motion).</span></li>
+            <li><span>Domain warp</span><span class="muted">The noise is used to distort its own coordinates, so the pattern folds into itself.</span></li>
+            <li><span>Flow</span><span class="muted">The pattern drifts in one direction and changes over time.</span></li>
+            <li><span>OKLCH</span><span class="muted">The values become colours through a lookup in OKLCH, a colour space in which equal steps look equally different to the eye.</span></li>
+          </ul>
+        </div>
+        <figure class="land vid"><div class="ph"><video muted loop playsinline preload="none" poster="video/rec-1929.jpg" src="video/rec-1929.mp4" aria-label="Banded colour lookup"></video></div></figure>
+        <figure class="land vid"><div class="ph"><video muted loop playsinline preload="none" poster="video/rec-1756b.jpg" src="video/rec-1756b.mp4" aria-label="Pink field, halftone"></video></div></figure>
+        <div class="note">
+          <div class="h"><span class="lbl">Image</span><p class="q-h">Texture effects are layered on top of the image.</p></div>
+          <p class="q">Halftone screens, grain and colour bands are added at different scales. Depending on which ones are strong, the same motion can look like liquid, like print, or like a screen seen up close.</p>
+        </div>
+        <figure class="land vid"><div class="ph"><video muted loop playsinline preload="none" poster="video/rec-1754.jpg" src="video/rec-1754.mp4" aria-label="Red field with grid screen"></video></div></figure>
+        <figure class="land vid"><div class="ph"><video muted loop playsinline preload="none" poster="video/rec-1800.jpg" src="video/rec-1800.mp4" aria-label="Pale field, dot screen"></video></div></figure>
+        <figure class="land vid solo"><div class="ph"><video muted loop playsinline preload="none" poster="video/rec-1956.jpg" src="video/rec-1956.mp4" aria-label="Violet field, crystalline surface"></video></div></figure>
+        <div class="note">
+          <div class="h"><span class="lbl">Interface</span><p class="q-h">I also wrote the control interface.</p></div>
+          <p class="q">Every parameter can be changed while the image runs. The program moves gradually from the old value to the new one, so the structure, colour and surface change smoothly instead of switching at once.</p>
+        </div>
+        <figure class="w vid"><div class="ph"><video muted loop playsinline preload="none" poster="video/style-change.jpg" src="video/style-change.mp4" aria-label="Parameters interpolated live"></video></div><figcaption class="q-ui muted">Changing parameters while the image runs</figcaption></figure>
+      </div>
+    </div>
+  </article>
+
+  <!-- Macchina Inutile: a useless machine after Munari -->
+  <article id="macchina" class="project" aria-label="Macchina Inutile">
+    <div class="ticker t-small" aria-hidden="true"><div class="track"><div class="run"><span>Wood</span><span class="dot">·</span> <span>Motor</span><span class="dot">·</span> <span>Rotation</span><span class="dot">·</span> <span>Balance</span><span class="dot">·</span> <span>No purpose</span><span class="dot">·</span> <span>Bruno Munari</span><span class="dot">·</span> <span>2026</span><span class="dot">·</span></div><div class="run"><span>Wood</span><span class="dot">·</span> <span>Motor</span><span class="dot">·</span> <span>Rotation</span><span class="dot">·</span> <span>Balance</span><span class="dot">·</span> <span>No purpose</span><span class="dot">·</span> <span>Bruno Munari</span><span class="dot">·</span> <span>2026</span><span class="dot">·</span></div></div></div>
+    <div class="spread">
+      <aside class="info">
+        <div class="top lbl"><span>Art</span><span>Kinetic object · 2026</span></div>
+        <h2 class="t-heading">Macchina Inutile</h2>
+        <p class="t-heading muted">Balance Without Purpose</p>
+        <p class="lede q-h">A machine with no use: a light frame of thin wooden sticks, with a small motor that keeps its top turning.</p>
+        <dl class="meta q-ui">
+          <dt>Year</dt><dd>2026</dd>
+          <dt>Title</dt><dd>Equilibrio Senza Scopo</dd>
+          <dt>Course</dt><dd>Critica del Design, Politecnico di Milano</dd>
+          <dt>Type</dt><dd>Kinetic object, short essay</dd>
+          <dt>Material</dt><dd>Thin wooden sticks, small electric motor</dd>
+          <dt>After</dt><dd>Bruno Munari, Macchine inutili</dd>
+        </dl>
+      </aside>
+      <div class="flow">
+        <figure class="vid port tall3 solo"><div class="ph"><video muted loop playsinline preload="none" poster="video/macchina.jpg?v=2" src="video/macchina.mp4?v=2" aria-label="The wooden frame turning slowly on its motor"></video></div></figure>
+        <div class="note">
+          <div class="h"><span class="lbl">Object</span><p class="q-h">The machine moves but produces nothing.</p></div>
+          <p class="q">It does not cut, carry or make anything, and each turn of the top leaves everything exactly as it was.</p>
+        </div>
+        <div class="note">
+          <div class="h"><span class="lbl">Use</span><p class="q-h">The machine can only be watched.</p></div>
+          <p class="q">The frame is so fragile that touching it would upset its balance. The viewer cannot use it and has to keep a distance.</p>
+        </div>
+        <div class="note">
+          <div class="h"><span class="lbl">Position</span><p class="q-h">The project looks at design without a function.</p></div>
+          <p class="q">Design projects usually go from a problem to a result that solves it. This one drops the result and looks only at how a mechanism is put together and kept in balance. It follows Bruno Munari’s Macchine inutili (“useless machines”), hanging objects he began making in the 1930s to be looked at rather than used. The essay argues that an object without a task can make people slow down and look at it closely.</p>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- 04 Art -->
+  <section class="project" aria-label="Art">
+    <div class="ticker t-small" aria-hidden="true"><div class="track"><div class="run"><span>Spiral forms</span><span class="dot">·</span> <span>Sound design</span><span class="dot">·</span> <span>DJ set</span><span class="dot">·</span> <span>Fabbrica del Vapore</span><span class="dot">·</span> <span>2025</span><span class="dot">·</span></div><div class="run"><span>Spiral forms</span><span class="dot">·</span> <span>Sound design</span><span class="dot">·</span> <span>DJ set</span><span class="dot">·</span> <span>Fabbrica del Vapore</span><span class="dot">·</span> <span>2025</span><span class="dot">·</span></div></div></div>
+    <div class="frame archive-head">
+      <span class="lbl">Art</span>
+      <p class="q-ui muted">Work made outside course briefs: spiral forms built with a wooden, motor-driven mechanism, and DJ sets, among them the sound design for a night event at Fabbrica del Vapore in Milan in 2025.</p>
+    </div>
+    <div class="wall">
+      <figure class="s2"><div class="ph"><img loading="lazy" decoding="async" src="img/ev-dj.jpg" alt="Two performers at a mixing desk before a projected visual" width="886" height="886"></div><figcaption class="q-ui"><span>Fabbrica del Vapore</span><span class="muted">Sound design</span></figcaption></figure>
+      <figure><div class="ph flash" tabindex="0" role="button" aria-pressed="false" aria-label="Play the DJ set video. Warning: it has flashing lights."><video muted loop playsinline preload="none" poster="video/dj-set.jpg" src="video/dj-set.mp4" aria-hidden="true"></video><span class="warn q-ui"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.5 15 14.5H1z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M8.9 5.5 6.2 9.6h2.2L7.1 12.6l3-4.3H7.9z" fill="currentColor"/></svg>Flashing lights</span><span class="hint lbl"></span></div><figcaption class="q-ui"><span>Live set</span><span class="muted">DJing</span></figcaption></figure>
+      <figure><div class="ph"><img loading="lazy" decoding="async" src="img/ev-dj2.jpg" alt="DJ in headphones at three Pioneer decks, a red-lit screen behind" width="1280" height="1600"></div><figcaption class="q-ui"><span>Live set</span><span class="muted">DJing</span></figcaption></figure>
+      <figure><div class="ph"><img loading="lazy" decoding="async" src="img/sp-red.jpg" alt="Spiral object of fanned coloured sheets" width="1280" height="1600"></div><figcaption class="q-ui"><span>Spiral forms · Model 1</span><span class="muted">Kinetic object</span></figcaption></figure>
+      <figure><div class="ph"><img loading="lazy" decoding="async" src="img/sp-table.jpg" alt="Spiral of sheets on a table" width="1200" height="1600"></div><figcaption class="q-ui"><span>Spiral forms · Model 2</span><span class="muted">Kinetic object</span></figcaption></figure>
+    </div>
+  </section>
+</div>
+
+<div class="view" id="archive" data-view="archive">
+  <section class="cover" aria-label="Archive">
+    <img decoding="async" src="img/tr-badges-cover.jpg" alt="">
+    <h1 class="t-display">Archive</h1>
+  </section>
+
+  <!-- 05 Archive -->
+  <section class="project" aria-label="Archive">
+    <div class="frame archive-head">
+      <span class="lbl">04</span>
+      <p class="q-ui muted">Coursework, exercises and side projects from 2024 to 2026. They include a brand exercise for Tempio Record, visuals for Oriental Techno Club, graphic and layout design, hand sketching practice, reversible tiles, a rain shelter and graphics for Artopia Gallery.</p>
+    </div>
+    <div class="wall">
+      <figure class="s2"><div class="ph"><img loading="lazy" decoding="async" src="img/gd-poster.jpg" alt="Green posters on a billboard in a park" width="1600" height="1200"></div><figcaption class="q-ui"><span>Tempio Record · Posters</span><span class="muted">Graphic design</span></figcaption></figure>
+      <figure><div class="ph"><img loading="lazy" decoding="async" src="img/tr-vinyl.jpg" alt="Sealed record sleeve, 25 years limited edition, Tempio Record" width="1600" height="1131"></div><figcaption class="q-ui"><span>Tempio Record · Sleeve</span><span class="muted">Graphic design</span></figcaption></figure>
+      <figure><div class="ph"><img loading="lazy" decoding="async" src="img/tr-box.jpg" alt="Light blue shipping box printed with the Tempio logo" width="1110" height="1387"></div><figcaption class="q-ui"><span>Tempio Record · Packaging</span><span class="muted">Graphic design</span></figcaption></figure>
+      <figure class="s2"><div class="ph"><img loading="lazy" decoding="async" src="img/tr-badges.jpg" alt="Three pin badges in green and pink" width="1600" height="1185"></div><figcaption class="q-ui"><span>Tempio Record · Badges</span><span class="muted">Graphic design</span></figcaption></figure>
+      <figure><div class="ph"><img loading="lazy" decoding="async" src="img/otc-poster.jpg" alt="Poster with a green ink brushstroke and the Oriental Techno Club logo" width="1143" height="1600"></div><figcaption class="q-ui"><span>Oriental Techno Club · Event</span><span class="muted">Poster design</span></figcaption></figure>
+      <figure><div class="ph"><img loading="lazy" decoding="async" src="img/otc-podcast3.jpg" alt="Podcast cover #3, Uzuki, on an ochre floral pattern" width="1600" height="1600"></div><figcaption class="q-ui"><span>Oriental Techno Club · #3</span><span class="muted">Podcast cover</span></figcaption></figure>
+      <figure><div class="ph"><img loading="lazy" decoding="async" src="img/otc-dragon.jpg" alt="Illustration of a dragon with lanterns and smoke" width="864" height="1184"></div><figcaption class="q-ui"><span>Dragon · AI-generated</span><span class="muted">Illustration</span></figcaption></figure>
+      <figure><div class="ph"><img loading="lazy" decoding="async" src="img/gd-layout.jpg" alt="Pink layout with drill illustration" width="1131" height="1600"></div><figcaption class="q-ui"><span>Drill</span><span class="muted">Layout design</span></figcaption></figure>
+      <figure><div class="ph"><img loading="lazy" decoding="async" src="img/gd-drill.jpg" alt="Teal and red layout of drill parts" width="1131" height="1600"></div><figcaption class="q-ui"><span>Drill parts</span><span class="muted">Layout design</span></figcaption></figure>
+      <figure><div class="ph"><img loading="lazy" decoding="async" src="img/bal-poster.jpg" alt="Vaporina poster for Alessi on a street billboard" width="1600" height="1351"></div><figcaption class="q-ui"><span>Vaporina · Alessi</span><span class="muted">Poster design</span></figcaption></figure>
+      <figure><div class="ph"><img loading="lazy" decoding="async" src="img/sk-drill1.jpg" alt="Pencil sketches of a cordless drill" width="1104" height="1600"></div><figcaption class="q-ui"><span>Drill</span><span class="muted">Hand sketching</span></figcaption></figure>
+      <figure><div class="ph"><img loading="lazy" decoding="async" src="img/sk-drill2.jpg" alt="Coloured sketches of drills" width="1106" height="1600"></div><figcaption class="q-ui"><span>Drills in colour</span><span class="muted">Hand sketching</span></figcaption></figure>
+      <figure class="s2"><div class="ph"><img loading="lazy" decoding="async" src="img/sk-dims.jpg" alt="Front and side sketch with dimensions of 120 cm and 67 cm" width="1600" height="1000"></div><figcaption class="q-ui"><span>Front and side view with dimensions</span><span class="muted">Hand sketching</span></figcaption></figure>
+      <figure class="s2"><div class="ph"><img loading="lazy" decoding="async" src="img/sk-tictac.jpg" alt="Product sketches" width="1236" height="1600"></div><figcaption class="q-ui"><span>Product studies</span><span class="muted">Hand sketching</span></figcaption></figure>
+      <figure><div class="ph"><img loading="lazy" decoding="async" src="img/tes-black.jpg" alt="Black and white interlocking curved tiles" width="476" height="428"></div><figcaption class="q-ui"><span>Tessellation · Black</span><span class="muted">Tile design</span></figcaption></figure>
+      <figure><div class="ph"><img loading="lazy" decoding="async" src="img/tes-white.jpg" alt="White curved tiles on blue" width="406" height="502"></div><figcaption class="q-ui"><span>Tessellation · White</span><span class="muted">Tile design</span></figcaption></figure>
+      <figure class="s2"><div class="ph"><img loading="lazy" decoding="async" src="img/nz-shelter.jpg" alt="Timber shelter with an orange roof and benches, rendered in a white studio" width="1600" height="903"></div><figcaption class="q-ui"><span>Rain shelter · New Zealand</span><span class="muted">Spatial design</span></figcaption></figure>
+      <figure><div class="ph"><img loading="lazy" decoding="async" src="img/art-bag2.jpg" alt="Tote bag with dot pattern and art·pia logo" width="1067" height="1600"></div><figcaption class="q-ui"><span>Artopia Gallery · Tote bag</span><span class="muted">Graphic design</span></figcaption></figure>
+      <figure><div class="ph"><img loading="lazy" decoding="async" src="img/art-book2.jpg" alt="Catalogue cover Il sogno di Icaro" width="1200" height="1600"></div><figcaption class="q-ui"><span>Artopia Gallery · Catalogue</span><span class="muted">Editorial design</span></figcaption></figure>
+    </div>
+  </section>
+
+  <section id="about" class="frame about" aria-label="About and contact">
+    <div class="portrait"><img loading="lazy" decoding="async" src="img/portrait.jpg" alt="Portrait of Zhengye Liao" width="1237" height="1600"></div>
+    <div class="txt">
+      <div style="display:grid;gap:var(--s24)">
+        <span class="lbl">About</span>
+        <p class="t-title">I grew up in Guangdong, China, and study product design (BSc) at Politecnico di Milano. In 2026 I spent an exchange semester in industrial design at ABK Stuttgart. I interned at Artopia Gallery in 2025. Since 2023 I have been a promoter and resident artist at Tempio Del Futuro Perduto*, a cultural space in Milan.</p>
+      </div>
+      <!-- on a phone the experience list lives here instead of the first screen, so the Work frame has room there -->
+      <div class="xp xp-m">
+        <span class="lbl">Experience</span>
+        <ol class="t-ui">
+          <li class="long"><span class="yr">2023–Now</span><span class="org">Politecnico di Milano</span><span class="role">BSc Product Design</span></li>
+          <li><span class="yr">2025</span><span class="org">Artopia Gallery</span><span class="role">Intern</span></li>
+          <li class="long"><span class="yr">2026</span><span class="org">Staatliche Akademie der Bildenden Künste Stuttgart</span><span class="role">Exchange, Industrial Design</span></li>
+          <li class="long"><span class="yr">2023–Now</span><span class="org">Tempio Del Futuro Perduto*</span><span class="role">Promoter, Resident Artist</span></li>
+        </ol>
+      </div>
+      <div style="display:grid;gap:var(--s16)">
+        <span class="lbl">Contact</span>
+        <p class="t-title mail" id="mail">Zhengye.Liao@mail.polimi.it</p>
+        <div class="contact-row t-ui">
+          <a class="btn t-ui" href="mailto:Zhengye.Liao@mail.polimi.it">email me</a>
+          <a class="btn t-ui" href="https://www.instagram.com/imzenyee/" target="_blank" rel="noopener">instagram</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+</main>
+
+<footer class="footer t-ui">
+  <span>© 2026 Zhengye Liao. All rights reserved.</span>
+  <span class="muted">milan 2026</span>
+</footer>
+</div>
+
+<script>
+  document.querySelectorAll('img').forEach(function (img) {
+    if (img.complete) return;
+    img.classList.add('pending');
+    img.addEventListener('load', function () { img.classList.replace('pending', 'loaded'); }, { once: true });
+    img.addEventListener('error', function () { img.classList.remove('pending'); }, { once: true });
+  });
+  var calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* 1. pressable first screen: every letter in the intro and the index */
+  (function () {
+    if (calm) return;
+    var zones = Array.prototype.slice.call(document.querySelectorAll('.press'));
+    var chars = [];
+    zones.forEach(function (z) {
+      var walker = document.createTreeWalker(z, NodeFilter.SHOW_TEXT, {
+        acceptNode: function (n) { return n.nodeValue.trim() && !n.parentNode.closest('.bio, .what') ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT; }
+      });
+      var nodes = []; while (walker.nextNode()) nodes.push(walker.currentNode);
+      nodes.forEach(function (n) {
+        var cs = getComputedStyle(n.parentNode);
+        var fs = parseFloat(cs.fontSize), wg = cs.fontWeight;
+        var frag = document.createDocumentFragment();
+        var sr = document.createElement('span'); sr.className = 'sr'; sr.textContent = n.nodeValue; frag.appendChild(sr);
+        var vis = document.createElement('span'); vis.setAttribute('aria-hidden', 'true');
+        n.nodeValue.split(/(\s+)/).forEach(function (part) {
+          if (!part) return;
+          if (/^\s+$/.test(part)) { vis.appendChild(document.createTextNode(' ')); return; }
+          var w = document.createElement('span'); w.className = 'word';
+          for (var i = 0; i < part.length; i++) {
+            var c = document.createElement('span'); c.className = 'ch'; c.textContent = part[i];
+            c.style.setProperty('--wg', wg);
+            w.appendChild(c); chars.push({ el: c, r: Math.max(56, fs * 1.15), on: false });
+          }
+          vis.appendChild(w);
+        });
+        frag.appendChild(vis);
+        n.parentNode.replaceChild(frag, n);
+      });
+    });
+    var raf = 0, px = -9999, py = -9999;
+    function release(o) { if (!o.on) return; o.on = false; o.el.classList.remove('hot'); o.el.style.removeProperty('--w'); o.el.style.removeProperty('--sy'); }
+    function press() {
+      raf = 0;
+      chars.forEach(function (o) {
+        var b = o.el.getBoundingClientRect();
+        if (b.bottom < -50 || b.top > innerHeight + 50) { release(o); return; }
+        var d = Math.hypot(px - (b.left + b.width / 2), py - (b.top + b.height / 2));
+        var k = Math.max(0, 1 - d / o.r);
+        k = k * k * (3 - 2 * k);
+        if (k > 0.01) {
+          o.on = true; o.el.classList.add('hot');
+          o.el.style.setProperty('--w', (100 + 25 * k).toFixed(1));
+          o.el.style.setProperty('--sy', (1 - 0.18 * k).toFixed(3));
+        } else release(o);
+      });
+    }
+    function move(e) { px = e.clientX; py = e.clientY; if (!raf) raf = requestAnimationFrame(press); }
+    function away() { px = py = -9999; chars.forEach(release); }
+    zones.forEach(function (z) {
+      z.addEventListener('pointermove', move);
+      z.addEventListener('pointerdown', move);
+      z.addEventListener('pointerleave', away);
+      z.addEventListener('pointercancel', away);
+      z.addEventListener('pointerup', function (e) { if (e.pointerType !== 'mouse') away(); });
+    });
+  })();
+
+  /* 2. index preview following the pointer */
+  (function () {
+    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+    var peek = document.createElement('div'); peek.className = 'peek'; peek.setAttribute('aria-hidden', 'true');
+    var im = document.createElement('img'); im.alt = ''; peek.appendChild(im); document.body.appendChild(peek);
+    var x = 0, y = 0, tx = 0, ty = 0, run = false;
+    function tick() {
+      x += (tx - x) * (calm ? 1 : 0.18); y += (ty - y) * (calm ? 1 : 0.18);
+      peek.style.transform = 'translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px)';
+      if (run) requestAnimationFrame(tick);
+    }
+    document.querySelectorAll('[data-preview]').forEach(function (row) {
+      /* left half of the row: preview waits in the gap beside the names; right half: it follows the pointer */
+      function gapX(e) {
+        var rb = row.getBoundingClientRect();
+        if (e.clientX > rb.left + rb.width / 2) {
+          var x = e.clientX + 24;
+          return x + 280 > innerWidth - 2 ? e.clientX - 280 - 24 : x;
+        }
+        var w = row.querySelector('.what').getBoundingClientRect();
+        return Math.max(w.left - 280 - 24, row.querySelector('.name').getBoundingClientRect().left + 220);
+      }
+      row.addEventListener('pointerenter', function (e) {
+        im.src = row.getAttribute('data-preview');
+        tx = gapX(e); ty = e.clientY - 175;
+        if (!peek.classList.contains('on')) { x = tx; y = ty; }
+        peek.classList.add('on');
+        if (!run) { run = true; requestAnimationFrame(tick); }
+      });
+      row.addEventListener('pointermove', function (e) { tx = gapX(e); ty = e.clientY - 175; });
+      row.addEventListener('pointerleave', function () { peek.classList.remove('on'); run = false; });
+    });
+  })();
+
+  /* 3. hard-edge reveal, only for images that start below the first screen */
+  (function () {
+    if (calm || !('IntersectionObserver' in window)) return;
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+    }, { rootMargin: '0px 0px -8% 0px' });
+    var fold = window.innerHeight;
+    document.querySelectorAll('.flow .ph, .wall .ph').forEach(function (ph) {
+      if (ph.getBoundingClientRect().top < fold) return;
+      ph.classList.add('reveal'); io.observe(ph);
+    });
+  })();
+
+  /* 4. letter flicker: decode on hover (nav, index names) and once on entry (labels) */
+  var GLYPHS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/·-+';
+  function flicker(el) {
+    if (calm || el._busy) return;
+    var cells = el.querySelectorAll('.ch');
+    if (cells.length) return flickerCells(el, Array.prototype.slice.call(cells));
+    var orig = el._orig || (el._orig = el.textContent);
+    var keepW = el.getBoundingClientRect().width; el._busy = true;
+    if (getComputedStyle(el).display === 'inline') el.style.display = 'inline-block';
+    el.style.width = keepW + 'px'; hold(el, true);
+    var lower = orig === orig.toLowerCase(), f = 0, frames = Math.min(14, 6 + orig.length);
+    (function step() {
+      var done = Math.floor((f / frames) * orig.length), out = '';
+      for (var i = 0; i < orig.length; i++) {
+        var ch = orig[i];
+        if (i < done || ch === ' ' || ch === '.' || ch === '·') out += ch;
+        else { var g = GLYPHS[(Math.random() * GLYPHS.length) | 0]; out += lower ? g.toLowerCase() : g; }
+      }
+      el.textContent = out;
+      if (f++ < frames) setTimeout(step, 38);
+      else { el.textContent = orig; el.style.width = ''; hold(el, false); el._busy = false; }
+    })();
+  }
+  /* while its letters scramble a word stays on one line and nothing is cut: its box grows by 1.8em for the wider random
+     letters, and an equal negative margin keeps the words beside it where they are */
+  function hold(el, on) {
+    el.style.whiteSpace = on ? 'nowrap' : '';
+    if (on) {
+      var x = 1.8 * parseFloat(getComputedStyle(el).fontSize);
+      el.style.width = (parseFloat(el.style.width) + x) + 'px';
+      /* a word near the right edge of the screen (the last menu word) grows to the left instead, its letters set from
+         the right, so it never runs off the page */
+      if (document.documentElement.clientWidth - el.getBoundingClientRect().right < x) { el.style.marginLeft = -x + 'px'; el.style.justifyContent = 'flex-end'; el.style.textAlign = 'right'; }
+      else el.style.marginRight = -x + 'px';
+    }
+    else { el.style.marginRight = el.style.marginLeft = el.style.justifyContent = el.style.textAlign = ''; }
+  }
+  /* pressable letters: scramble each letter cell in place, so press and flicker work together */
+  function flickerCells(el, cells) {
+    el._busy = true;
+    var keepW = el.getBoundingClientRect().width; el.style.width = keepW + 'px'; hold(el, true);
+    var orig = cells.map(function (c) { return c.textContent; });
+    var lower = orig.join('') === orig.join('').toLowerCase(), f = 0, frames = Math.min(14, 6 + cells.length);
+    (function step() {
+      var done = Math.floor((f / frames) * cells.length);
+      cells.forEach(function (c, i) {
+        if (i < done) c.textContent = orig[i];
+        else { var g = GLYPHS[(Math.random() * GLYPHS.length) | 0]; c.textContent = lower ? g.toLowerCase() : g; }
+      });
+      if (f++ < frames) setTimeout(step, 38);
+      else { cells.forEach(function (c, i) { c.textContent = orig[i]; }); el.style.width = ''; hold(el, false); el._busy = false; }
+    })();
+  }
+  document.querySelectorAll('.header a, [data-preview]').forEach(function (a) {
+    var t = a.querySelector('.sc') || a;
+    a.addEventListener('pointerenter', function () { flicker(t); });
+    a.addEventListener('focus', function () { flicker(t); });
+  });
+  (function () {
+    if (calm || !('IntersectionObserver' in window)) return;
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (e) { if (e.isIntersecting) { flicker(e.target); io.unobserve(e.target); } });
+    }, { rootMargin: '0px 0px -10% 0px' });
+    document.querySelectorAll('.lbl').forEach(function (l) { if (!l.closest('.loader') && l.children.length === 0 && l.textContent.trim()) io.observe(l); });
+    document.querySelectorAll('.info .top span').forEach(function (l) { io.observe(l); });
+  })();
+
+  /* 6. rotating keyword: every 3s the word scrambles into the next one, only while in view */
+  (function () {
+    if (calm) return;
+    function morph(el, next) {
+      var from = el.textContent, len = Math.max(from.length, next.length), f = 0, frames = 12;
+      (function step() {
+        var done = Math.floor((f / frames) * next.length), out = '';
+        for (var i = 0; i < len; i++) {
+          if (i < done) out += next[i] || '';
+          else if (next[i] === ' ') out += ' ';
+          else if (i < next.length || f < frames / 2) out += GLYPHS[(Math.random() * GLYPHS.length) | 0].toLowerCase();
+        }
+        el.textContent = out;
+        if (f++ < frames) setTimeout(step, 40); else el.textContent = next;
+      })();
+    }
+    /* a project's keyword waits until its first picture has scrolled up under the header, then changes at once and every 3s */
+    var cycles = [].map.call(document.querySelectorAll('.cycle'), function (el) {
+      var p = el.closest('.project');
+      return { el: el, set: p && p.querySelector('.flow .ph'), words: el.getAttribute('data-words').split('|'), i: 0, timer: 0 };
+    });
+    function next(c) { c.i = (c.i + 1) % c.words.length; morph(c.el, c.words[c.i]); }
+    function check() {
+      var top = document.querySelector('.header').getBoundingClientRect().bottom, vh = window.innerHeight;
+      cycles.forEach(function (c) {
+        var r = c.el.getBoundingClientRect(), live = r.width > 0 && r.bottom > top && r.top < vh && (!c.set || c.set.getBoundingClientRect().bottom <= top);
+        if (live && !c.timer) { c.timer = setInterval(function () { next(c); }, 3000); setTimeout(function () { if (c.timer) next(c); }, 300); }
+        else if (!live && c.timer) { clearInterval(c.timer); c.timer = 0; }
+      });
+    }
+    window.addEventListener('scroll', check, { passive: true }); window.addEventListener('resize', check); check();
+  })();
+
+  /* 10. opening orbit: the shapes drift round an ellipse and slowly change outline; pressing one pulls it to the
+     centre and opens it to the full screen while its name grows into the page title, the other two fall away */
+  (function () {
+    var orbit = document.querySelector('.orbit');
+    if (!orbit) return;
+    var stage = orbit.querySelector('.stage'), blobs = orbit.querySelectorAll('.blob'), tags = orbit.querySelectorAll('.tag');
+    var HERO = 1, spin = 0, last = 0, W = 0, H = 0, pad = 16, go = null, hov = -1, slow = 0, grow = [0, 0, 0], wob = 0;
+    var navTo = [document.querySelector('.header [data-nav="art"]'), null, document.querySelector('.header [data-nav="archive"]')];
+    var down = orbit.querySelector('.down'), lead = orbit.querySelector('.lead'), work = orbit.querySelector('.work'), frameLine = work.querySelector('path');
+    /* a bubble: ten points round a circle, each pushed in and out by three slow waves of different speed, joined by a smooth curve */
+    var N = 10, phase = [0.4, 2.3, 4.1];
+    function bubble(w, h, r, amp, t, i) {
+      var pts = [];
+      for (var k = 0; k < N; k++) {
+        var a = k / N * Math.PI * 2, f = phase[i] + k;
+        var n = 0.55 * Math.sin(t * 0.00047 + f * 1.3) + 0.3 * Math.sin(t * 0.00081 - f * 2.1 + i) + 0.15 * Math.sin(t * 0.00133 + f * 3.7);
+        var rr = r * (1 + amp * n);
+        pts.push([w / 2 + Math.cos(a) * rr, h / 2 + Math.sin(a) * rr]);
+      }
+      var d = 'M' + pts[0][0].toFixed(1) + ' ' + pts[0][1].toFixed(1);
+      for (k = 0; k < N; k++) {
+        var p0 = pts[(k - 1 + N) % N], p1 = pts[k], p2 = pts[(k + 1) % N], p3 = pts[(k + 2) % N];
+        d += 'C' + (p1[0] + (p2[0] - p0[0]) / 6).toFixed(1) + ' ' + (p1[1] + (p2[1] - p0[1]) / 6).toFixed(1) + ' ' +
+             (p2[0] - (p3[0] - p1[0]) / 6).toFixed(1) + ' ' + (p2[1] - (p3[1] - p1[1]) / 6).toFixed(1) + ' ' +
+             p2[0].toFixed(1) + ' ' + p2[1].toFixed(1);
+      }
+      return 'path("' + d + 'Z")';
+    }
+    function band() { return parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--band')) || 0; }
+    function size() {
+      W = stage.clientWidth; H = stage.clientHeight;
+      /* the frame keeps one shape (5:4) and scales to the room it has: beside the text on a wide screen, above it on a phone */
+      work.style.width = work.style.height = '';
+      var room = W < 640 ? lead.offsetTop - work.offsetTop - 24 : H - work.offsetTop - 24,
+          fw = Math.min(work.offsetWidth, Math.max(120, room) * 1.25);
+      work.style.width = fw + 'px'; work.style.height = fw / 1.25 + 'px';
+    }
+    /* the Work frame: a rounded rectangle whose edge is bent by a few slow waves of different length round the outline;
+       only when the pointer crosses the line itself is the line plucked along with it, then it wobbles back */
+    var topY = 0, workLbl = null, M = 36, off = new Float32Array(M), vel = new Float32Array(M), px = -1e4, py = -1e4, qx = -1e4, qy = -1e4;
+    var waves = [[2, 0.00021, 0.3, 0.45], [3, -0.00034, 1.9, 0.3], [4, 0.00047, 4.2, 0.17], [5, -0.00061, 2.6, 0.08]];
+    window.addEventListener('pointermove', function (ev) { px = ev.clientX; py = ev.clientY; }, { passive: true });
+    document.addEventListener('pointerleave', function () { px = py = qx = qy = -1e4; });
+    function outline(w, h, t, box) {
+      var pts = [], base = [], nrm = [];
+      for (var k = 0; k < M; k++) {
+        var a = k / M * Math.PI * 2, c = Math.cos(a), si = Math.sin(a), n = 0;
+        waves.forEach(function (q) { n += q[3] * Math.sin(q[0] * a + q[1] * t + q[2]); });
+        /* the waves only pull the line inward from the box, so it never leaves the corner of the screen */
+        var g = 0.93 + 0.07 * n;
+        var bx = Math.sign(c) * Math.pow(Math.abs(c), 0.6) * w / 2 * g, by = Math.sign(si) * Math.pow(Math.abs(si), 0.6) * h / 2 * g;
+        var len = Math.hypot(bx, by) || 1;
+        base.push([w / 2 + bx, h / 2 + by]); nrm.push([bx / len, by / len]);
+      }
+      /* the pointer's path since the last frame: if it passes within a few pixels of the line, pull the nearest part along */
+      var ax = qx - box.left, ay = qy - box.top, bx2 = px - box.left, by2 = py - box.top, dx = bx2 - ax, dy = by2 - ay, seg = dx * dx + dy * dy;
+      if (seg > 0.25 && qx > -1e3) {
+        var hit = -1, best = 9;
+        for (k = 0; k < M; k++) {
+          var lx = base[k][0] + nrm[k][0] * off[k], ly = base[k][1] + nrm[k][1] * off[k];
+          var u = Math.max(0, Math.min(1, ((lx - ax) * dx + (ly - ay) * dy) / seg));
+          var dd = Math.hypot(ax + dx * u - lx, ay + dy * u - ly);
+          if (dd < best) { best = dd; hit = k; }
+        }
+        if (hit >= 0) {
+          var along = dx * nrm[hit][0] + dy * nrm[hit][1];
+          for (var j = -4; j <= 4; j++) { var kk = (hit + j + M) % M; vel[kk] += Math.max(-14, Math.min(14, along * 0.5)) * Math.exp(-j * j / 5); }
+        }
+      }
+      qx = px; qy = py;
+      for (k = 0; k < M; k++) {
+        vel[k] += -off[k] * 0.05; vel[k] *= 0.9;
+        off[k] = Math.max(-36, Math.min(36, off[k] + vel[k]));
+        pts.push([base[k][0] + nrm[k][0] * off[k], base[k][1] + nrm[k][1] * off[k]]);
+      }
+      var d = 'M' + pts[0][0].toFixed(1) + ' ' + pts[0][1].toFixed(1);
+      for (k = 0; k < M; k++) {
+        var p0 = pts[(k - 1 + M) % M], p1 = pts[k], p2 = pts[(k + 1) % M], p3 = pts[(k + 2) % M];
+        d += 'C' + (p1[0] + (p2[0] - p0[0]) / 6).toFixed(1) + ' ' + (p1[1] + (p2[1] - p0[1]) / 6).toFixed(1) + ' ' +
+             (p2[0] - (p3[0] - p1[0]) / 6).toFixed(1) + ' ' + (p2[1] - (p3[1] - p1[1]) / 6).toFixed(1) + ' ' + p2[0].toFixed(1) + ' ' + p2[1].toFixed(1);
+      }
+      topY = pts[Math.round(M * 3 / 4) % M][1];
+      return d + 'Z';
+    }
+    function ease(x) { return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; }
+    function frame(now) {
+      var dt = last ? Math.min(64, now - last) : 16; last = now;
+      if (!stage.offsetWidth) { requestAnimationFrame(frame); return; }
+      /* the opening runs on its own clock: a pressed bubble opens its page, a push down opens Products and sends the other names to the menu */
+      var e, still = calm ? 0 : 1, fly = !go || go.fly;
+      if (go) {
+        /* going forward the picture comes slowly to rest at full screen, holds there, and only then does the page scroll
+           up to its title. Pushed open, it carries on from the scroll's own movement and slows down; pressed, it eases in and out */
+        var pr = Math.min(1, (now - go.t0) / (go.dur || 1100)), g0 = go.from || 0;
+        e = g0 + (1 - g0) * (go.rev ? ease(1 - pr) : go.fly ? 1 - (1 - pr) * (1 - pr) : ease(pr));
+        if (pr >= 1 && !go.fired) { go.fired = true; go.done(); }
+      }
+      else {
+        /* most of the opening follows the scroll, both ways, and stays where the scroll leaves it */
+        HERO = 1; e = lvl;
+      }
+      /* a pointer resting on a bubble slows all three down, and that bubble and its name grow a little; both ease in and out */
+      var kf = 1 - Math.exp(-dt / 180);
+      slow += ((hov >= 0 && !go ? 1 : 0) - slow) * kf;
+      for (var gi = 0; gi < 3; gi++) grow[gi] += ((gi === hov && !go ? 1 : 0) - grow[gi]) * kf;
+      var pace = 1 - 0.8 * slow;
+      wob += dt * pace;
+      spin += dt * 0.00005 * (1 - e) * still * pace;
+      /* the ellipse is tall enough that two shapes passing above each other never touch, and their names fit between */
+      var sr = stage.getBoundingClientRect(), wr = work.getBoundingClientRect(), ww = wr.width, wh = wr.height;
+      /* the largest bubbles for which two passing above each other still clear one another, with the name between */
+      var m = 24, s = Math.min(ww * 0.36, (wh / 2 - m - 10) / (0.56 + 1.06 / 1.73)), rx = ww / 2 - s * 0.56 - m, ry = wh / 2 - s * 0.56 - m;
+      var ox = wr.left - sr.left + ww / 2, oy = wr.top - sr.top + wh / 2 - 10;
+      /* the frame: a soft rounded rectangle whose edge is pushed in and out by slow waves */
+      frameLine.setAttribute('d', outline(ww, wh, calm ? 0 : now, wr));
+      (workLbl || (workLbl = work.querySelector('.work-lbl'))).style.top = topY.toFixed(1) + 'px';
+      work.style.opacity = Math.max(0, 1 - e * 3);
+      for (var i = 0; i < 3; i++) {
+        var a = spin * Math.PI * 2 + i * Math.PI * 2 / 3 + Math.PI / 2;
+        var depth = (Math.sin(a) + 1) / 2, sc = (0.9 + depth * 0.16) * (1 + 0.18 * grow[i]);
+        var cx = ox + Math.cos(a) * rx, cy = oy + Math.sin(a) * ry, w = s * sc, h = s * sc;
+        var b = blobs[i], t = tags[i], op = 1, r = Math.min(w, h) / 2 * 0.9, amp = 0.09, cx0 = cx, cy0 = cy, r0 = r;
+        if (i === HERO) {
+          cx += (W / 2 - cx) * e; cy += (H / 2 - cy) * e; w += (W - w) * e; h += (H - h) * e;
+          /* the bubble grows with the screen as a bubble, and only at the end swells past the corners, so the picture ends edge to edge */
+          var k = Math.pow(Math.max(0, (e - 0.75) / 0.25), 2); r = Math.min(w, h) / 2 * 0.9 + (Math.hypot(w, h) / 2 * 1.2 - Math.min(w, h) / 2 * 0.9) * k; amp *= 1 - k;
+        } else if (fly) {
+          /* the shape follows its name up towards the menu and shrinks away under the header */
+          var f = Math.min(1, e / 0.6), fe = f * f * (3 - 2 * f), nr = navTo[i].getBoundingClientRect();
+          cx += (nr.left + nr.width / 2 - sr.left - cx) * fe; cy += (nr.top + nr.height / 2 - sr.top - cy) * fe;
+          w *= 1 - fe; h *= 1 - fe; op = 1 - fe; r = Math.min(w, h) / 2 * 0.9;
+        } else { op = Math.max(0, 1 - e * 2.2); w *= 1 - e * 0.5; h *= 1 - e * 0.5; r = Math.min(w, h) / 2 * 0.9; }
+        b.style.width = w.toFixed(1) + 'px'; b.style.height = h.toFixed(1) + 'px';
+        b.style.transform = 'translate(' + (cx - w / 2).toFixed(1) + 'px,' + (cy - h / 2).toFixed(1) + 'px)';
+        b.style.clipPath = bubble(w, h, r, amp, calm ? 0 : wob, i);
+        b.style.opacity = op; b.style.zIndex = i === HERO && e > 0 ? 4 : grow[i] > 0.05 ? 3 : Math.round(depth * 3);
+        b.style.pointerEvents = op < 0.2 ? 'none' : '';
+        /* each name sits small under its shape; the pressed one grows to title size and settles bottom left,
+           exactly where the page it opens has its title, the other names leave first */
+        var big = parseFloat(getComputedStyle(t).fontSize), z0 = 14 * (1 + 0.3 * grow[i]) / big, tw = t.offsetWidth, th = t.offsetHeight;
+        var x = sr.left + cx0 - tw * z0 / 2, y = sr.top + cy0 + r0 * 1.05 + 8, z = z0;
+        if (i === HERO) { z = z0 + (1 - z0) * e; x += (sr.left + pad - x) * e; y += (sr.top + H - pad - th - y) * e; t.style.visibility = ''; }
+        else if (fly) {
+          /* the name rises to its own link in the menu, which shows once the name lands on it */
+          var ex = nr.left + (nr.width - tw * z0) / 2, ey = nr.top + (nr.height - th * z0) / 2;
+          x += (ex - x) * fe; y += (ey - y) * fe; t.style.opacity = '';
+          t.style.visibility = f >= 1 ? 'hidden' : ''; navTo[i].classList.toggle('away', f < 1);
+        }
+        else t.style.opacity = Math.max(0, 1 - e * 3);
+        t.style.transform = 'translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px) scale(' + z.toFixed(4) + ')';
+      }
+      lead.style.opacity = Math.max(0, 1 - e * 3);
+      down.style.opacity = Math.max(0, 1 - e * 4); down.style.visibility = e > 0.25 ? 'hidden' : '';
+      stage.style.zIndex = 6;
+      requestAnimationFrame(frame);
+    }
+    size(); window.addEventListener('resize', size); if (document.fonts) document.fonts.ready.then(size);
+    /* a pressed bubble opens its page once it fills the screen; the orbit is reset behind it for the way back */
+    blobs.forEach(function (b, i) {
+      b.addEventListener('pointerenter', function (ev) { if (ev.pointerType !== 'touch') hov = i; });
+      b.addEventListener('pointerleave', function () { if (hov === i) hov = -1; });
+      b.addEventListener('click', function (ev) {
+        ev.preventDefault();
+        if (go) return;
+        hov = -1;
+        var name = b.getAttribute('href').slice(1);
+        if (calm) { window.site.show(name, null, true); window.site.settle(); return; }
+        window.scrollTo({ top: 0, behavior: 'instant' });
+        lvl = 0; HERO = i; go = { t0: performance.now(), done: function () {
+          window.site.show(name, null, true, true); window.site.settle(1000);
+          requestAnimationFrame(function () { HERO = 1; go = null; tags.forEach(function (t) { t.style.opacity = ''; }); });
+        } };
+      });
+    });
+    /* a push down on the home page plays the opening to the end by itself and opens Products, the other names flying
+       up to the menu as before; a push up from the top of Products plays it backwards */
+    down.addEventListener('click', function () { window.orbit.open(); });
+    var lvl = 0, SCRUB = 0.85;
+    window.orbit = {
+      busy: function () { return !!go; },
+      /* how far the scroll has pushed the opening, 0 to 1 of the part that follows the scroll */
+      level: function () { return lvl / SCRUB; },
+      scrub: function (v) { if (go || calm) return; lvl = Math.max(0, Math.min(1, v)) * SCRUB; },
+      /* scrolled all the way: the bubble fills the screen, so Products takes its place and scrolls up to its title */
+      finish: function () {
+        if (go) return;
+        lvl = 0; window.site.show('products', null, true, true); window.scrollTo({ top: 0, behavior: 'instant' }); window.site.settle(1000);
+      },
+      /* the keys play the whole opening by themselves */
+      open: function () {
+        if (go) return;
+        if (calm) { window.site.show('products', null, true); window.site.settle(); return; }
+        /* past that part the rest plays by itself from where the scroll left it */
+        HERO = 1; go = { t0: performance.now(), dur: Math.max(700, 1400 * (1 - lvl)), fly: true, from: lvl, done: function () { lvl = 0;
+          window.site.show('products', null, true, true); window.scrollTo({ top: 0, behavior: 'instant' }); window.site.settle(1000);
+          requestAnimationFrame(function () { go = null; });
+        } };
+      },
+      back: function () {
+        if (calm) { window.site.show('home', null, true, true, true); return; }
+        HERO = 1; go = { t0: performance.now(), dur: 900, fly: true, rev: true, done: function () { go = null; } };
+        window.site.show('home', null, true, true, true);
+      }
+    };
+    requestAnimationFrame(frame);
+  })();
+
+  /* project videos: play only while on screen; reduced motion keeps the still */
+  (function () {
+    if (calm || !('IntersectionObserver' in window)) return;
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (e) { var v = e.target; if (e.isIntersecting) { v.preload = 'auto'; var p = v.play(); if (p && p.catch) p.catch(function () {}); } else v.pause(); });
+    }, { rootMargin: '200px 0px' });
+    document.querySelectorAll('.flow video').forEach(function (v) { io.observe(v); });
+  })();
+
+  /* the DJ clip has strobe lights, so it never plays by itself: a mouse plays it while hovering, touch and keyboard toggle it */
+  document.querySelectorAll('.flash').forEach(function (ph) {
+    var v = ph.querySelector('video'), hov = false;
+    if (calm || !matchMedia('(hover: hover)').matches) ph.classList.add('tap');
+    function play() { v.preload = 'auto'; var p = v.play(); if (p && p.catch) p.catch(function () {}); ph.classList.add('on'); ph.setAttribute('aria-pressed', 'true'); }
+    function stop() { v.pause(); ph.classList.remove('on'); ph.setAttribute('aria-pressed', 'false'); }
+    function toggle() { if (v.paused) play(); else stop(); }
+    ph.addEventListener('pointerenter', function (e) { if (e.pointerType === 'mouse' && !calm) { hov = true; play(); } });
+    ph.addEventListener('pointerleave', function (e) { if (e.pointerType === 'mouse' && hov) { hov = false; stop(); } });
+    ph.addEventListener('click', function () { if (!hov) toggle(); });
+    ph.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); } });
+    if ('IntersectionObserver' in window) new IntersectionObserver(function (es) { if (!es[0].isIntersecting) stop(); }).observe(ph);
+  });
+
+  /* 9. project word sets: each word drifts to a new width and weight; lines are re-broken and every line is stretched along
+     Archivo's width axis to run edge to edge, with the same gap between all words */
+  document.querySelectorAll('.wordset').forEach(function (set) {
+    var words = Array.prototype.slice.call(set.querySelectorAll('span'));
+    var live = words.slice(1, -1), WD = [62, 75, 100, 112, 125], WG = [300, 500, 700], LO = 62, HI = 125;
+    var room = 0, gap = 24, gap0 = 24, pad = 16, lh = 52, lines = 1, track = 0;
+    /* each word starts at a plain setting; base = where the word wants to be, shown = what the line makes of it */
+    words.forEach(function (w) { w._d = 100; w._g = 700; w._t = w.cloneNode(true); w._t.className = 'twin'; set.appendChild(w._t); });
+    function fv(d, g) { return '"wdth" ' + d.toFixed(1) + ', "wght" ' + Math.round(g); }
+    /* width is close to linear in both axes, so four measurements per word are enough to predict it */
+    /* all the probe copies go in at once and are read in one pass, so the page lays out once instead of four times a word */
+    function calibrate() {
+      var C = [[LO, 300], [HI, 300], [LO, 700], [HI, 700]], probes = [];
+      words.forEach(function (w) {
+        C.forEach(function (c) { var t = w._t.cloneNode(true); t.style.letterSpacing = ''; t.style.fontVariationSettings = fv(c[0], c[1]); set.appendChild(t); probes.push([w, c[0] + '_' + c[1], t]); });
+        w._m = {};
+      });
+      probes.forEach(function (p) { p[0]._m[p[1]] = p[2].getBoundingClientRect().width; });
+      probes.forEach(function (p) { p[2].remove(); });
+    }
+    function width(w, d, g) {
+      var u = (d - LO) / (HI - LO), v = (g - 300) / 400, m = w._m;
+      return (m[LO + '_300'] * (1 - u) + m[HI + '_300'] * u) * (1 - v) + (m[LO + '_700'] * (1 - u) + m[HI + '_700'] * u) * v;
+    }
+    /* how far a line can shrink and grow with every word at the ends of the width axis */
+    function span(r, at) { var t = (r.length - 1) * gap; r.forEach(function (i) { t += width(words[i], at === null ? words[i]._d : at, words[i]._g); }); return t; }
+    /* break the words into exactly `lines` lines, staying close to their own widths and never asking a line to stretch past the axis */
+    function breaks() {
+      /* look for lines the width axis alone can fill, widening the one shared gap up to double if needed;
+         otherwise a short line gains weight, and only as a last resort opens its letters */
+      for (var k = 2; k <= 4; k++) { gap = gap0 * k / 2; var r = part(true); if (r) return r; }
+      gap = gap0; return part(false);
+    }
+    function part(strict) {
+      var n = words.length, memo = {};
+      function go(i, m) {
+        var key = i + ',' + m; if (key in memo) return memo[key];
+        var res = null;
+        if (m === 0) res = i === n ? { cost: 0, rows: [] } : null;
+        else for (var j = i + 1; j <= n - (m - 1); j++) {
+          var r = []; for (var k = i; k < j; k++) r.push(k);
+          if (span(r, LO) > room) break;
+          if (strict && span(r, HI) < room) continue;
+          var rest = go(j, m - 1); if (!rest) continue;
+          var d = (room - span(r, null)) / room, cost = d * d + (span(r, HI) < room ? 100 : 0) + rest.cost;
+          if (!res || cost < res.cost) res = { cost: cost, rows: [r].concat(rest.rows) };
+        }
+        return (memo[key] = res);
+      }
+      var out = go(0, lines); return out ? out.rows : null;
+    }
+    /* settings go on the word and on its hidden twin; the twin keeps the real letters, so it can be measured while the word scrambles */
+    function apply(w, d, ls, g) {
+      var v = fv(d, g), l = ls ? (track + ls).toFixed(2) + 'px' : '';
+      w.style.fontVariationSettings = v; w.style.letterSpacing = l;
+      w._t.style.fontVariationSettings = v; w._t.style.letterSpacing = l;
+    }
+    function real(w) { return w._t.getBoundingClientRect().width; }
+    /* fill a line exactly, measured on the real words: first move every word by the same share of its width range;
+       a line still short at the widest setting then gains weight, and only after that opens its letters */
+    function fit(r) {
+      function load(t, end, u, ls) {
+        var tot = (r.length - 1) * gap;
+        /* set every word first, then read them all, so each try costs one layout rather than one per word */
+        r.forEach(function (i) { var w = words[i]; apply(w, w._d + t * (end - w._d), ls, w._g + u * (700 - w._g)); });
+        r.forEach(function (i) { tot += real(words[i]); });
+        return tot;
+      }
+      function bisect(f) { var lo = 0, hi = 1; for (var k = 0; k < 9; k++) { var m = (lo + hi) / 2; if (f(m) > room) hi = m; else lo = m; } return lo; }
+      var used = load(0, HI, 0, 0);
+      if (used > room) { var lo = 0, hi = 1; for (var k = 0; k < 9; k++) { var m = (lo + hi) / 2; if (load(m, LO, 0, 0) > room) lo = m; else hi = m; } load(hi, LO, 0, 0); return; }
+      if (load(1, HI, 0, 0) >= room) { var t = bisect(function (x) { return load(x, HI, 0, 0); }); load(t, HI, 0, 0); return; }
+      if (load(1, HI, 1, 0) >= room) { var u = bisect(function (x) { return load(1, HI, x, 0); }); load(1, HI, u, 0); return; }
+      used = load(1, HI, 1, 0);
+      var chars = 0; r.forEach(function (i) { chars += words[i]._n; });
+      load(1, HI, 1, (room - used) / chars);
+    }
+    function lay() {
+      var rows = breaks();
+      /* if the chosen line count has no break (a face still settling can make it impossible), try the nearest counts
+         with the same rule, so the words are never left unplaced */
+      for (var dl = 1; !rows && dl <= 2; dl++) {
+        var base = lines;
+        lines = base - dl; if (lines >= 1) rows = breaks();
+        if (!rows) { lines = base + dl; if (lines <= 2) rows = breaks(); }
+        if (!rows) lines = base; else set.style.height = (pad * 2 + lines * lh) + 'px';
+      }
+      if (!rows) return false;
+      rows.forEach(function (r, j) {
+        fit(r);
+        var x = pad;
+        var ws = r.map(function (i) { return real(words[i]); });
+        r.forEach(function (i, k) { var w = words[i], rw = ws[k]; w.style.width = rw.toFixed(2) + 'px'; w.style.transform = 'translate(' + x.toFixed(2) + 'px,' + (pad + j * lh) + 'px)'; x += rw + gap; });
+      });
+      return true;
+    }
+    /* read back where the words really landed: each one right of the word before it on its line, and not all on one spot */
+    function placed() {
+      var rs = words.map(function (w) { return w.getBoundingClientRect(); }), xs = {};
+      for (var i = 0; i < rs.length; i++) {
+        if (!rs[i].width) return false;
+        xs[Math.round(rs[i].left)] = 1;
+        if (i && Math.abs(rs[i].top - rs[i - 1].top) < 2 && rs[i].left < rs[i - 1].right - 2) return false;
+      }
+      return Object.keys(xs).length > Math.min(2, words.length - 1);
+    }
+    /* a try that did not hold (page not drawn yet, face still on its way) keeps the words hidden and runs again shortly */
+    var tries = 0, again = 0;
+    function retry() {
+      set.classList.remove('ready'); fitted = -1; clearTimeout(again);
+      again = setTimeout(function () { measure(true); }, Math.min(2000, 150 * ++tries));
+    }
+    /* a hidden page has no width to fit, and the same width needs no new fit, so both are skipped */
+    var fitted = -1;
+    function measure(force) {
+      var w0 = set.clientWidth;
+      if (!w0 || (w0 === fitted && force !== true)) return;
+      fitted = w0;
+      set.style.fontSize = set.style.lineHeight = set.style.letterSpacing = '';
+      var cs = getComputedStyle(set);
+      pad = parseFloat(cs.paddingLeft); lh = parseFloat(cs.lineHeight) || 52;
+      gap0 = gap = window.innerWidth < 640 ? 12 : 24;
+      room = set.clientWidth - pad * 2;
+      calibrate();
+      /* a block the browser has not drawn yet measures zero-wide words; laid out from that, every word lands on one spot */
+      if (!words.every(function (w) { return w._m[LO + '_300'] > 0 && w._m[HI + '_700'] > 0; })) { retry(); return; }
+      /* never more than two lines: where two lines at the narrowest setting cannot hold the words, the whole set is
+         scaled down (size, leading and tracking together) until they can; wide screens keep the full size */
+      /* the longer of the two lines at the best split, every word at its narrowest */
+      function two() {
+        var a = words.map(function (w) { return width(w, LO, 700); }), best = Infinity;
+        for (var j = 1; j < a.length; j++) {
+          var l = (j - 1) * gap0, r = (a.length - j - 1) * gap0;
+          for (var i = 0; i < a.length; i++) { if (i < j) l += a[i]; else r += a[i]; }
+          best = Math.min(best, Math.max(l, r));
+        }
+        return best;
+      }
+      var fs0 = parseFloat(cs.fontSize), lh0 = lh, ls0 = parseFloat(cs.letterSpacing) || 0, k = 1;
+      for (var q = 0; q < 4; q++) {
+        var need = two(); if (need <= room * 0.96) break;
+        k *= room * 0.96 / need;
+        set.style.fontSize = (fs0 * k).toFixed(2) + 'px';
+        set.style.lineHeight = (lh0 * k).toFixed(2) + 'px';
+        set.style.letterSpacing = (ls0 * k).toFixed(2) + 'px';
+        lh = lh0 * k;
+        calibrate();
+      }
+      track = parseFloat(cs.letterSpacing) || 0;
+      words.forEach(function (w) { w._n = (w._o || w.textContent).length; });
+      /* the line count is set once from the words at their plain width, so the block keeps its height */
+      var total = -gap; words.forEach(function (w) { total += width(w, 100, 700) + gap; });
+      /* pick the line count whose lines the width axis can fill for the most mixes of width and weight */
+      var keep = words.map(function (w) { return [w._d, w._g]; }), best = 1, bestOk = -1;
+      /* never more than two lines */
+      for (var L = Math.min(2, Math.max(1, Math.round(total / room) + 1)); L >= 1; L--) {
+        lines = L; var ok = 0;
+        for (var t = 0; t < 40; t++) {
+          live.forEach(function (w) { w._d = WD[(Math.random() * WD.length) | 0]; w._g = WG[(Math.random() * 3) | 0]; });
+          var hit = false; for (var k = 2; k <= 4 && !hit; k++) { gap = gap0 * k / 2; hit = !!part(true); }
+          if (hit) ok++;
+        }
+        if (ok > bestOk) { bestOk = ok; best = L; }
+      }
+      words.forEach(function (w, i) { w._d = keep[i][0]; w._g = keep[i][1]; });
+      lines = best; gap = gap0;
+      set.style.height = (pad * 2 + lines * lh) + 'px';
+      if (!lay()) { retry(); return; }
+      set.classList.add('ready');
+      if (!placed()) { retry(); return; }
+      tries = 0;
+    }
+    measure();
+    /* measure again when the block first comes into view and whenever its width changes (a page opened from the menu) */
+    if ('IntersectionObserver' in window) new IntersectionObserver(function (es) { if (es[0].isIntersecting && (!set.classList.contains('ready') || !placed())) measure(true); }).observe(set);
+    if ('ResizeObserver' in window) new ResizeObserver(function () { measure(); }).observe(set);
+    /* Safari brings a page back from its back/forward cache without running anything; check the words again then */
+    window.addEventListener('pageshow', function () { if (!placed()) measure(true); });
+    /* Safari can lay the words out in the fallback face and settle document.fonts.ready before Archivo arrives;
+       a hidden copy of the words at a fixed setting watches for the swap, and the block is fitted again */
+    var face = document.createElement('span');
+    face.className = 'twin'; face.setAttribute('aria-hidden', 'true');
+    face.textContent = words.map(function (w) { return w.textContent; }).join(' ');
+    face.style.fontVariationSettings = fv(100, 700);
+    set.appendChild(face);
+    var faceW = 0, rf;
+    function refit() { var fw = face.getBoundingClientRect().width; if (!fw || Math.abs(fw - faceW) < 0.5) return; faceW = fw; clearTimeout(rf); rf = setTimeout(function () { measure(true); }, 60); }
+    if ('ResizeObserver' in window) new ResizeObserver(refit).observe(face);
+    if (document.fonts) {
+      if (document.fonts.load) document.fonts.load('700 52px Archivo').then(refit, function () {});
+      if (document.fonts.addEventListener) document.fonts.addEventListener('loadingdone', refit);
+    }
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { measure(true); });
+    var rz; window.addEventListener('resize', function () { clearTimeout(rz); rz = setTimeout(measure, 200); });
+    if (calm) return;
+    var timer = 0, prev = -1, tweens = [], running = false;
+    function ease(t) { return 1 - Math.pow(1 - t, 3); }
+    function frame(now) {
+      tweens = tweens.filter(function (tw) {
+        var t = Math.min(1, (now - tw.t0) / 700), e = ease(t);
+        tw.w._d = tw.d0 + (tw.d1 - tw.d0) * e; tw.w._g = tw.g0 + (tw.g1 - tw.g0) * e;
+        return t < 1;
+      });
+      lay();
+      if (tweens.length) requestAnimationFrame(frame); else running = false;
+    }
+    function hit() {
+      var i; do { i = (Math.random() * live.length) | 0; } while (i === prev && live.length > 1); prev = i;
+      var w = live[i]; if (w._busy) return; w._busy = true; w.classList.add('busy');
+      var orig = w._o || (w._o = w.textContent);
+      var d1 = WD[(Math.random() * WD.length) | 0], g1 = WG[(Math.random() * 3) | 0];
+      var f = 0, frames = 10;
+      (function step() {
+        var done = Math.floor((f / frames) * orig.length), out = '';
+        for (var k = 0; k < orig.length; k++) out += (k < done || orig[k] === ' ') ? orig[k] : GLYPHS[(Math.random() * GLYPHS.length) | 0].toLowerCase();
+        w.textContent = out;
+        if (f++ < frames) setTimeout(step, 45);
+        else {
+          w.textContent = orig; w._busy = false; w.classList.remove('busy');
+          tweens.push({ w: w, t0: performance.now(), d0: w._d, d1: d1, g0: w._g, g1: g1 });
+          if (!running) { running = true; requestAnimationFrame(frame); }
+        }
+      })();
+    }
+    if ('IntersectionObserver' in window) new IntersectionObserver(function (es) {
+      if (es[0].isIntersecting && !timer) timer = setInterval(hit, 900);
+      else if (!es[0].isIntersecting) { clearInterval(timer); timer = 0; }
+    }).observe(set);
+    else timer = setInterval(hit, 900);
+  });
+
+  /* 8. ticker words: a random word scrambles and changes width/weight; both copies change together so the loop never jumps */
+  (function () {
+    if (calm) return;
+    document.querySelectorAll('.ticker').forEach(function (tk) {
+      var track = tk.querySelector('.track'), first = tk.querySelector('.run');
+      /* repeat the run until the band is twice the screen wide, then loop by exactly one run */
+      function fill() {
+        var runs = track.querySelectorAll('.run');
+        for (var k = runs.length - 1; k > 0; k--) track.removeChild(runs[k]);
+        runs = [first];
+        var need = Math.max(2, Math.ceil((tk.offsetWidth * 2) / Math.max(1, first.offsetWidth)) + 1);
+        for (var c = track.querySelectorAll('.run').length; c < need; c++) {
+          var cp = track.appendChild(first.cloneNode(true));
+          /* a copy made mid-scramble starts from the real word, not the scrambled letters */
+          Array.prototype.forEach.call(first.querySelectorAll('span:not(.dot)'), function (w, i) {
+            var d = cp.querySelectorAll('span:not(.dot)')[i];
+            if (w._o) d.textContent = w._o;
+            d.style.width = ''; d.classList.remove('busy');
+          });
+        }
+        track.style.setProperty('--shift', first.offsetWidth + 'px');
+        var all = track.querySelectorAll('.run');
+        pairs = Array.prototype.map.call(first.querySelectorAll('span:not(.dot)'), function (w, i) {
+          return Array.prototype.map.call(all, function (r) { return r.querySelectorAll('span:not(.dot)')[i]; });
+        });
+      }
+      var pairs; fill();
+      /* fit the band again once Archivo is in; Safari can settle fonts.ready before the face arrives, so the face's own load counts too */
+      if (document.fonts && document.fonts.ready) document.fonts.ready.then(fill);
+      if (document.fonts && document.fonts.load) document.fonts.load('700 13px Archivo').then(fill, function () {});
+      var rz; window.addEventListener('resize', function () { clearTimeout(rz); rz = setTimeout(fill, 200); });
+      var on = false, timer = 0;
+      function rnd(a, b) { return a + Math.random() * (b - a); }
+      /* words are drawn from a shuffled bag, so every word gets its turn before any word changes again */
+      var bag = [], last = null;
+      function draw() {
+        if (!bag.length) {
+          bag = pairs.map(function (p, i) { return i; });
+          for (var i = bag.length - 1; i > 0; i--) { var j = (Math.random() * (i + 1)) | 0, t = bag[i]; bag[i] = bag[j]; bag[j] = t; }
+          if (bag.length > 1 && bag[bag.length - 1] === last) bag.unshift(bag.pop());
+        }
+        for (var k = bag.length - 1; k >= 0; k--) if (!pairs[bag[k]][0]._busy) return pairs[last = bag.splice(k, 1)[0]];
+        return null;
+      }
+      /* each beat changes one word, now and then two, a little apart in time */
+      function beat() {
+        var n = Math.random() < 0.75 ? 1 : 2;
+        for (var k = 0; k < n; k++) {
+          var pair = draw(); if (!pair) return;
+          pair.forEach(function (w) { w._busy = true; });
+          setTimeout(hit.bind(null, pair), k ? rnd(300, 700) : 0);
+        }
+      }
+      function hit(pair) {
+        var orig = pair[0]._o || (pair[0]._o = pair[0].textContent);
+        /* any width and weight along the axes, but always far enough from the current one to be seen */
+        var d0 = pair[0]._tw || 100, g0 = pair[0]._tg || 700, wd, wg;
+        do wd = rnd(62, 125); while (Math.abs(wd - d0) < 18);
+        do wg = rnd(300, 700); while (Math.abs(wg - g0) < 120);
+        /* freeze the word's width while its letters scramble, so neighbours stay still; reshape only afterwards */
+        pair.forEach(function (w) { w._busy = true; w.style.width = w.getBoundingClientRect().width + 'px'; w.style.whiteSpace = 'nowrap'; w.classList.add('busy'); });
+        var f = 0, frames = 6 + ((Math.random() * 8) | 0), gap = rnd(50, 75);
+        (function step() {
+          var done = Math.floor((f / frames) * orig.length), out = '';
+          for (var i = 0; i < orig.length; i++) out += (i < done || orig[i] === ' ') ? orig[i] : GLYPHS[(Math.random() * GLYPHS.length) | 0].toLowerCase();
+          pair.forEach(function (w) { w.textContent = out; });
+          if (f++ < frames) setTimeout(step, gap);
+          else {
+            pair.forEach(function (w) { w.textContent = orig; w.style.width = ''; w.classList.remove('busy'); });
+            morph(pair, wd, wg, rnd(700, 1300));
+          }
+        })();
+      }
+      /* the new width and weight are stepped in script, frame by frame, rather than by a CSS transition: Safari does not
+         lay a line out again while it runs a font-variation-settings transition, so a growing word would spill over its
+         neighbours. Each step here is a plain style change, which every browser lays out at once */
+      function morph(pair, wd, wg, dur) {
+        var w0 = pair[0], d0 = w0._tw || 100, g0 = w0._tg || 700, t0 = performance.now();
+        (function frame(now) {
+          var t = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - t, 3);
+          var v = '"wdth" ' + (d0 + (wd - d0) * e).toFixed(1) + ', "wght" ' + (g0 + (wg - g0) * e).toFixed(0);
+          pair.forEach(function (w) { w.style.fontVariationSettings = v; });
+          if (t < 1) requestAnimationFrame(frame);
+          else { w0._tw = wd; w0._tg = wg; pair.forEach(function (w) { w._busy = false; }); }
+        })(t0);
+      }
+      /* scroll in script so the loop always wraps at the run's current width, even while words morph */
+      track.style.animation = 'none';
+      var pos = 0, lastT = 0;
+      function roll(t) {
+        if (!timer) { lastT = 0; return; }
+        var dt = lastT ? Math.min(64, t - lastT) : 16; lastT = t;
+        pos -= dt * 0.045;
+        var wRun = first.offsetWidth; if (-pos >= wRun) pos += wRun;
+        track.style.transform = 'translateX(' + pos.toFixed(2) + 'px)';
+        requestAnimationFrame(roll);
+      }
+      /* beats come at uneven times, so the band never settles into a rhythm */
+      function next() { beat(); timer = setTimeout(next, rnd(1200, 2800)); }
+      function run() { timer = setTimeout(next, rnd(100, 600)); requestAnimationFrame(roll); }
+      if ('IntersectionObserver' in window) new IntersectionObserver(function (es) {
+        on = es[0].isIntersecting;
+        if (on && !timer) run(); else if (!on) { clearTimeout(timer); timer = 0; }
+      }).observe(tk);
+      else run();
+    });
+  })();
+  /* 11. hand-drawn rules: every straight border becomes one shaky pen line. Each line gets its own waves, thickness,
+     tilt and loose ends from its own seed, so no two look alike, and it keeps the same look when the page resizes */
+  (function () {
+    var NS = 'http://www.w3.org/2000/svg', n = 0;
+    var specs = [['.header', 'b'], ['.index', 't'], ['.row', 't'], ['.row:last-child', 'b'], ['.project', 't'], ['.meta', 't'],
+      ['.meta dd', 'b'], ['.note li', 't'], ['.about', 't'], ['.btn', 'box'], ['.footer', 't'], ['.ticker', 'b'], ['.wordset', 'b'],
+      ['.orbit .reach a', 'u'], ['.docs a', 'u'], ['.xp li', 't'], ['.xp li:last-child', 'b']];
+    function rng(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; var t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+    /* one line's character: drawn once from its seed */
+    function pen(seed, w) {
+      var r = rng(seed * 7919 + 13), R = function (a, b) { return a + (b - a) * r(); };
+      return { w: w * R(0.95, 1.25), waves: [[R(140, 420), R(0.5, 1.6), R(0, 6.3)], [R(40, 110), R(0.25, 0.8), R(0, 6.3)], [R(9, 24), R(0.08, 0.3), R(0, 6.3)]],
+        thick: [[R(60, 260), R(0.12, 0.3), R(0, 6.3)], [R(14, 40), R(0.05, 0.15), R(0, 6.3)]],
+        tilt: R(-1.4, 1.4), bow: R(-1.8, 1.8), a: R(-6, 3), b: R(-3, 6), hookA: R(-1.5, 1.5), hookB: R(-1.5, 1.5), taper: R(0.3, 0.8) };
+    }
+    function wave(list, x) { var v = 0; list.forEach(function (q) { v += q[1] * Math.sin(x / q[0] * 6.2832 + q[2]); }); return v; }
+    /* a filled stroke from x0 to x1 along y, as a path; vert swaps the axes for the sides of a box */
+    function stroke(c, x0, x1, y, vert) {
+      var a = x0 + c.a, b = x1 + c.b, len = Math.max(1, b - a), sc = Math.min(1, Math.sqrt(len / 360)), top = [], bot = [];
+      for (var i = 0, m = Math.max(6, Math.ceil(len / 4)); i <= m; i++) {
+        var u = i / m, x = a + len * u, s = x - x0;
+        var yy = y + sc * (wave(c.waves, s) + c.tilt * (u - 0.5) + c.bow * Math.sin(Math.PI * u)) +
+          c.hookA * Math.pow(Math.max(0, 1 - u * len / 14), 2) + c.hookB * Math.pow(Math.max(0, 1 - (1 - u) * len / 14), 2);
+        var end = Math.min(1, u * len / 10, (1 - u) * len / 10), t = c.w * (1 + wave(c.thick, s)) * (c.taper + (1 - c.taper) * end) / 2;
+        top.push([x, yy - t]); bot.unshift([x, yy + t]);
+      }
+      return 'M' + top.concat(bot).map(function (p) { return (vert ? [p[1], p[0]] : p).map(function (v) { return v.toFixed(2); }).join(' '); }).join('L') + 'Z';
+    }
+    function draw(it) {
+      var el = it.el, host = it.host, er = el.getBoundingClientRect(), hr = host.getBoundingClientRect(), hs = getComputedStyle(host);
+      var ox = er.left - hr.left - parseFloat(hs.borderLeftWidth), oy = er.top - hr.top - parseFloat(hs.borderTopWidth), W = er.width, H = er.height, d = [];
+      if (it.side === 't') d.push(stroke(it.c[0], ox, ox + W, oy + it.bw / 2));
+      else if (it.side === 'b') d.push(stroke(it.c[0], ox + it.x0, ox + W, oy + H - it.bw / 2));
+      else if (it.side === 'u') d.push(stroke(it.c[0], ox, ox + W, oy + H + 1));
+      else {
+        var h = it.bw / 2;
+        d.push(stroke(it.c[0], ox, ox + W, oy + h), stroke(it.c[1], ox, ox + W, oy + H - h),
+          stroke(it.c[2], oy, oy + H, ox + h, true), stroke(it.c[3], oy, oy + H, ox + W - h, true));
+      }
+      it.svg.innerHTML = d.map(function (v) { return '<path d="' + v + '"/>'; }).join('');
+    }
+    var items = [];
+    specs.forEach(function (sp) {
+      document.querySelectorAll(sp[0]).forEach(function (el) {
+        var cs = getComputedStyle(el), side = sp[1];
+        var bw = side === 't' ? parseFloat(cs.borderTopWidth) : side === 'u' ? 1 : side === 'box' ? parseFloat(cs.borderTopWidth) : parseFloat(cs.borderBottomWidth);
+        if (!bw) return;
+        var col = side === 't' ? cs.borderTopColor : side === 'b' ? cs.borderBottomColor : null;
+        el.classList.add(side === 'box' ? 'hand-box' : 'hand-' + side);
+        /* clipped boxes draw into their parent, so the line on their edge is not cut off */
+        /* so do sections drawn only near the screen (content-visibility: auto), which clip their paint at their edge */
+        var host = (cs.overflow !== 'visible' || cs.clipPath !== 'none' || cs.contentVisibility === 'auto') ? el.parentNode : el;
+        if (getComputedStyle(host).position === 'static') host.style.position = 'relative';
+        var svg = document.createElementNS(NS, 'svg'); svg.setAttribute('class', 'hand'); svg.setAttribute('aria-hidden', 'true');
+        svg.style.left = svg.style.top = '0'; svg.setAttribute('width', 1); svg.setAttribute('height', 1);
+        if (col) svg.style.color = col;
+        host.appendChild(svg);
+        var x0 = 0;
+        /* a fact row's rule runs under both its name and its value as one line */
+        if (el.tagName === 'DD' && el.previousElementSibling) {
+          el.previousElementSibling.classList.add('hand-b');
+          x0 = el.previousElementSibling.getBoundingClientRect().left - el.getBoundingClientRect().left;
+        }
+        var c = []; for (var k = 0; k < 4; k++) c.push(pen(++n, bw));
+        items.push({ el: el, host: host, svg: svg, side: side, bw: bw, x0: x0, c: c, dd: el.tagName === 'DD' });
+      });
+    });
+    /* only lines on the page being shown, and only when their box has changed, are drawn again */
+    function all(force) { items.forEach(function (it) {
+      var el = it.el; if (!el.offsetWidth && !el.offsetHeight) return;
+      var key = el.offsetLeft + ',' + el.offsetTop + ',' + el.offsetWidth + ',' + el.offsetHeight;
+      if (!force && key === it.key) return;
+      it.key = key;
+      if (it.dd) it.x0 = it.el.previousElementSibling.getBoundingClientRect().left - it.el.getBoundingClientRect().left;
+      draw(it);
+    }); }
+    all();
+    if ('ResizeObserver' in window) { var ro = new ResizeObserver(function () { all(); }); items.forEach(function (it) { ro.observe(it.el); }); }
+    var rz; window.addEventListener('resize', function () { clearTimeout(rz); rz = setTimeout(all, 150); });
+    if (document.fonts) document.fonts.ready.then(function () { all(true); });
+  })();
+  /* 12. pages: home, Products, Art and Archive are shown one at a time and follow the address, so links, the back
+     button and a shared link all land on the right page; a menu jump opens the next picture as a circle from the word */
+  (function () {
+    var views = {}, links = {}, cur = '';
+    document.querySelectorAll('.view').forEach(function (v) { views[v.dataset.view] = v; });
+    document.querySelectorAll('.header [data-nav]').forEach(function (a) { links[a.dataset.nav] = a; });
+    function find(hash) {
+      var id = decodeURIComponent((hash || '').slice(1));
+      if (!id || id === 'top') return { v: 'home' };
+      if (views[id]) return { v: id };
+      var el = document.getElementById(id), v = el && el.closest('.view');
+      return v ? { v: v.dataset.view, el: el } : { v: 'home' };
+    }
+    function show(name, el, push, quiet, back) {
+      if (!views[name]) name = 'home';
+      var changed = name !== cur;
+      for (var k in views) views[k].classList.toggle('on', k === name);
+      if (changed && !quiet && cur) { views[name].classList.remove('fade'); void views[name].offsetWidth; views[name].classList.add('fade'); }
+      cur = name; document.body.dataset.view = name;
+      /* the menu words slide to their new places and the new page's word fades to grey, rather than jumping */
+      var before = {}; for (k in links) before[k] = links[k].getBoundingClientRect().left;
+      for (k in links) {
+        links[k].classList.toggle('here', k === name); links[k].classList.toggle('gone', name === 'home' && k === 'products');
+        if (name !== 'home') links[k].classList.remove('away');
+      }
+      if (changed && !calm) for (k in links) {
+        var l = links[k], now = l.getBoundingClientRect(), dx = before[k] - now.left;
+        if (!now.width || !dx || !l.offsetParent) continue;
+        l.style.transition = 'none'; l.style.transform = 'translateX(' + dx.toFixed(1) + 'px)';
+        void l.offsetWidth;
+        l.style.transition = 'transform 0.6s cubic-bezier(0.65, 0, 0.35, 1), color 0.6s'; l.style.transform = '';
+      }
+      if (push) {
+        var url = name === 'home' ? location.pathname + location.search : '#' + (el ? el.id : name);
+        try { history.pushState(null, '', url); } catch (err) {}
+      }
+      /* hidden pages measured nothing; let every layout script measure again now this one is on screen */
+      window.dispatchEvent(new Event('resize'));
+      if (el) el.scrollIntoView({ behavior: 'instant' });
+      else if (back && name === 'home') { var o = document.querySelector('.orbit'); window.scrollTo({ top: o.offsetHeight - o.querySelector('.stage').offsetHeight - 2, behavior: 'instant' }); }
+      else if (back) window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' });
+      else if (changed || push) window.scrollTo({ top: 0, behavior: 'instant' });
+      title();
+    }
+    /* scrolling past a page's opening picture takes its big title up into the menu, where it becomes the grey first word */
+    function title() {
+      var v = views[cur], a = links[cur];
+      if (!v || !a) return;
+      var cv = v.querySelector('.cover'), h = cv.querySelector('h1');
+      /* while its white band is still below the screen, the title waits at the bottom of the screen, on the picture;
+         once the band scrolls up to it, the title rides in the band with the page. Scrolling back up does the same in reverse */
+      var below = cv.getBoundingClientRect().bottom - window.innerHeight, band = cv.offsetHeight - cv.querySelector('img').offsetHeight;
+      h.style.translate = below > 0 ? '0 ' + (-Math.min(band, below)).toFixed(1) + 'px' : '';
+      /* it rides up with the page until it is about to slip under the header; then it shrinks, greys and rises into the
+         menu bar just after the name, and last slides along the bar to its place */
+      h.style.transform = ''; var r = h.getBoundingClientRect(), ar = a.getBoundingClientRect(), hd = document.querySelector('.header'), hb = hd.getBoundingClientRect().bottom;
+      var logo = hd.querySelector('a[href="#top"]').getBoundingClientRect(), xIn = logo.right + 24;
+      var pin = hb + 8, past = pin - r.top;
+      /* the slide along the bar takes only a short stretch of scrolling, so on a wide screen it is one quick pass */
+      var q1 = Math.max(0, Math.min(1, past / 140)), e1 = q1 * q1 * (3 - 2 * q1), q2 = Math.max(0, Math.min(1, (past - 140) / 50)), e2 = q2 * (2 - q2);
+      var z = 1 + (14 / parseFloat(getComputedStyle(h).fontSize) - 1) * e1, ty0 = ar.top + (ar.height - r.height * z) / 2;
+      var x = r.left + (xIn - r.left) * e1 + (ar.left - xIn) * e2, y = past <= 0 ? r.top : pin + (ty0 - pin) * e1, landed = q2 >= 1;
+      h.style.transform = past > 0 ? 'translate(' + (x - r.left).toFixed(1) + 'px,' + (y - r.top).toFixed(1) + 'px) scale(' + z.toFixed(4) + ')' : '';
+      h.style.color = e1 ? 'color-mix(in srgb, var(--muted) ' + (e1 * 100).toFixed(0) + '%, var(--ink))' : '';
+      h.style.visibility = landed ? 'hidden' : ''; a.classList.toggle('away', !landed);
+    }
+    var tq = 0;
+    window.addEventListener('scroll', function () { if (!tq) tq = requestAnimationFrame(function () { tq = 0; title(); }); }, { passive: true });
+    window.addEventListener('resize', function () { requestAnimationFrame(title); });
+    var busy = false;
+    /* a soft outline like the orbit bubbles: ten points round a circle, each nudged by slow waves */
+    function blob(cx, cy, r, amp, t) {
+      var pts = [], N = 10;
+      for (var k = 0; k < N; k++) {
+        var a = k / N * Math.PI * 2, n = 0.55 * Math.sin(t * 0.0047 + k * 1.3) + 0.3 * Math.sin(t * 0.0081 - k * 2.1) + 0.15 * Math.sin(t * 0.0133 + k * 3.7);
+        pts.push([cx + Math.cos(a) * r * (1 + amp * n), cy + Math.sin(a) * r * (1 + amp * n)]);
+      }
+      var d = 'M' + pts[0][0].toFixed(1) + ' ' + pts[0][1].toFixed(1);
+      for (k = 0; k < N; k++) {
+        var p0 = pts[(k - 1 + N) % N], p1 = pts[k], p2 = pts[(k + 1) % N], p3 = pts[(k + 2) % N];
+        d += 'C' + (p1[0] + (p2[0] - p0[0]) / 6).toFixed(1) + ' ' + (p1[1] + (p2[1] - p0[1]) / 6).toFixed(1) + ' ' +
+          (p2[0] - (p3[0] - p1[0]) / 6).toFixed(1) + ' ' + (p2[1] - (p3[1] - p1[1]) / 6).toFixed(1) + ' ' + p2[0].toFixed(1) + ' ' + p2[1].toFixed(1);
+      }
+      return 'path("' + d + 'Z")';
+    }
+    /* a menu jump: the word leaves the menu and grows into the page title bottom left, while the page's picture swells
+       out from where the word was, as a bubble, until it fills the screen */
+    var busy = false;
+    /* going back up runs it in reverse: the page shrinks into a bubble and its title into the word, both return to the menu,
+       and the page before shows underneath at its end */
+    function wipe(name, from, back) {
+      busy = true;
+      var leaving = cur, v = views[back ? leaving : name], img = v.querySelector('.cover img'), h1 = v.querySelector('.cover h1');
+      var box = document.createElement('div'); box.className = 'wipe'; box.setAttribute('aria-hidden', 'true');
+      box.innerHTML = '<img loading="lazy" decoding="async" alt="" src="' + img.getAttribute('src') + '">';
+      var word = document.createElement('span'); word.className = 'wipe-word t-display'; word.textContent = h1.textContent; word.setAttribute('aria-hidden', 'true');
+      document.body.appendChild(box); document.body.appendChild(word);
+      if (back) { box.style.clipPath = 'none'; show(name, null, true, true, true); from = links[leaving]; }
+      var br = box.getBoundingClientRect(), fr = from.getBoundingClientRect(), W = br.width, H = br.height;
+      var big = parseFloat(getComputedStyle(word).fontSize), z0 = 14 / big, tw = word.offsetWidth, th = word.offsetHeight;
+      /* the title lands bottom left on the picture; the scroll that follows moves it down into its white band */
+      var x1 = br.left + 16, y1 = br.top + H - 16 - th, R = Math.hypot(W, H) / 2 * 1.2, t0 = performance.now();
+      from.classList.add('away');
+      (function step(now) {
+        /* it eases in and out both ways; forward the picture then holds a second before the page scrolls up to the title */
+        var p = Math.min(1, (now - t0) / 1100), q = p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2, e = back ? 1 - q : q;
+        /* the word in the menu may still be sliding to its new place, so aim at where it is on this frame */
+        var fr = from.getBoundingClientRect();
+        var x0 = fr.left + (fr.width - tw * z0) / 2, y0 = fr.top + (fr.height - th * z0) / 2;
+        var cx0 = fr.left + fr.width / 2 - br.left, cy0 = fr.top + fr.height / 2 - br.top;
+        var cx = cx0 + (W / 2 - cx0) * e, cy = cy0 + (H / 2 - cy0) * e, r = 8 + (Math.min(W, H) / 2 * 0.9 - 8) * e;
+        /* a bubble while it travels; only at the end it swells past the corners so the picture ends edge to edge */
+        var k = Math.pow(Math.max(0, (e - 0.75) / 0.25), 2); r += (R - r) * k;
+        box.style.clipPath = blob(cx, cy, r, 0.09 * (1 - k), now);
+        var z = z0 + (1 - z0) * e;
+        word.style.transform = 'translate(' + (x0 + (x1 - x0) * e).toFixed(1) + 'px,' + (y0 + (y1 - y0) * e).toFixed(1) + 'px) scale(' + z.toFixed(4) + ')';
+        if (p < 1) requestAnimationFrame(step);
+        else {
+          if (!back) { show(name, null, true, true); settle(1000); } else from.classList.remove('away');
+          requestAnimationFrame(function () { box.remove(); word.remove(); busy = false; });
+        }
+      })(t0);
+    }
+    document.addEventListener('click', function (ev) {
+      var a = ev.target.closest('a[href^="#"]');
+      if (!a || ev.defaultPrevented || ev.metaKey || ev.ctrlKey || ev.shiftKey) return;
+      var to = find(a.getAttribute('href'));
+      if (to.v === cur) return;
+      ev.preventDefault();
+      if (a.dataset.nav && !calm) wipe(to.v, a); else { show(to.v, to.el, true); if (!to.el) settle(); }
+    });
+    function route() { var to = find(location.hash); show(to.v, to.el, false); }
+    window.addEventListener('popstate', route); window.addEventListener('hashchange', route);
+    /* after a page turn the page scrolls itself on until the title, in the white band under the picture, sits just under
+       the menu bar (where it would start to fly up into the menu); any scroll or key of the visitor's own stops it */
+    var auto = 0, autoOn = false;
+    /* the scroll position at which a page's title, in its band, sits just under the menu bar */
+    function titleTop(cv, h) {
+      var hb = document.querySelector('.header').getBoundingClientRect().bottom;
+      return Math.max(0, Math.round(cv.getBoundingClientRect().top + window.scrollY + cv.offsetHeight - parseFloat(getComputedStyle(h).bottom) - h.offsetHeight - (hb + 8)));
+    }
+    function stopSettle() { autoOn = false; cancelAnimationFrame(auto); }
+    function settle(wait) {
+      stopSettle();
+      var v = views[cur], cv = v && v.querySelector('.cover'); if (!cv) return;
+      var top = titleTop(cv, cv.querySelector('h1'));
+      if (calm) { window.scrollTo({ top: top, behavior: 'instant' }); return; }
+      /* the title follows the scroll (see title()), so it moves from the picture down into its band on the way */
+      var t0 = performance.now() + (wait || 0), y0;
+      autoOn = true;
+      auto = requestAnimationFrame(function step(now) {
+        if (!autoOn) return;
+        if (now < t0) { auto = requestAnimationFrame(step); return; }
+        if (y0 === undefined) y0 = window.scrollY;
+        /* slow, then fast, then a short stop under the menu: it starts gently (never from a dead stop, so the page turn
+           runs on into it), is fastest a little before halfway and comes to rest at the title */
+        /* after a hold it starts from rest: slow, then fast, then a short stop */
+        var p = Math.min(1, (now - t0) / (wait ? 1000 : 900)), e = wait ? 1 - Math.pow(1 - p * p * p, 2) : 1 - (1 - p) * (1 - p) * (1 + 1.6 * p);
+        window.scrollTo({ top: y0 + (top - y0) * e, behavior: 'instant' });
+        if (p < 1) auto = requestAnimationFrame(step); else autoOn = false;
+      });
+    }
+    window.addEventListener('touchstart', stopSettle, { passive: true });
+    window.addEventListener('keydown', stopSettle);
+    window.site = { show: show, cur: function () { return cur; }, settle: settle };
+    /* the pages read in order, home, Products, Art, Archive: pushing on past the end of one opens the next from its word
+       in the menu, pushing up past the top of one goes back to the end of the one before */
+    var ORDER = ['home', 'products', 'art', 'archive'], pull = 0, ty = null, rest = 0, restEnd = 0;
+    /* while a page turn runs, and for a moment after it, scrolling is held: a trackpad keeps sending its glide after the
+       hand lifts, which would otherwise scroll the new page away or turn a second page. Each glide event extends the
+       hold a little, up to 1.5 s after the turn */
+    /* once the turn itself has finished, a fresh scroll of the visitor's own is let through, also during the 1 s pause:
+       it comes after a gap in the wheel events, or speeds up where a glide only slows down */
+    var lastW = 0, lastD = 0;
+    function held(d) {
+      var now = Date.now(), a = Math.abs(d || 0), gap = now - lastW;
+      lastW = now;
+      if (busy || (window.orbit && window.orbit.busy())) { rest = now; restEnd = now + 1500; pull = 0; lastD = a; return true; }
+      if (rest && now - rest < 600 && now < restEnd) {
+        var fresh = d !== undefined && (gap > 160 || a > lastD * 1.5 + 6);
+        lastD = a;
+        if (!fresh) { rest = Math.max(rest, now - 350); pull = 0; return true; }
+      }
+      lastD = a; rest = 0; return false;
+    }
+    function push(d) {
+      if (held(d)) return true;
+      var i = ORDER.indexOf(cur), atTop = window.scrollY <= 0,
+        atEnd = window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2;
+      if (i === 0) {
+        /* home has no scroll of its own: 510px of scrolling grow the Products bubble most of the way, following the
+           scroll both ways; the last stretch plays by itself and runs straight on into Products settling on its title,
+           and the scroll still coming is held so it does not stop that */
+        var SPAN = 510;
+        pull = Math.max(0, window.orbit.level() * SPAN + d);
+        if (pull >= SPAN) { pull = 0; window.orbit.open(); rest = Date.now(); restEnd = rest + 2500; return true; }
+        window.orbit.scrub(pull / SPAN);
+      }
+      else if (d < 0 && atTop) {
+        pull = Math.min(0, pull) + d;
+        if (pull < -120) { pull = 0; if (i === 1) window.orbit.back(); else if (!calm) wipe(ORDER[i - 1], null, true); else show(ORDER[i - 1], null, true, true, true); return true; }
+      }
+      else if (d > 0 && atEnd && i < ORDER.length - 1) {
+        pull = Math.max(0, pull) + d;
+        if (pull > 120) { pull = 0; var nx = ORDER[i + 1]; if (calm) { show(nx, null, true); settle(); } else wipe(nx, links[nx]); return true; }
+      } else pull = 0;
+      return false;
+    }
+    /* a wheel the page turn is holding back (a trackpad's glide) does not stop the settling scroll; a fresh one does */
+    window.addEventListener('wheel', function (ev) { if (push(ev.deltaY)) ev.preventDefault(); else stopSettle(); }, { passive: false });
+    /* a finger on the screen is always the visitor's own: after the turn has finished it may scroll straight away */
+    window.addEventListener('touchstart', function (ev) { ty = ev.touches[0].clientY; if (!busy && !(window.orbit && window.orbit.busy())) rest = 0; }, { passive: true });
+    window.addEventListener('touchmove', function (ev) { if (ty === null) return; var d = ty - ev.touches[0].clientY; ty = ev.touches[0].clientY; if (push(d)) ev.preventDefault(); }, { passive: false });
+    /* keys that would scroll do the same on the home page, which has nothing to scroll */
+    window.addEventListener('keydown', function (ev) {
+      if (cur !== 'home' || ev.metaKey || ev.ctrlKey || ev.altKey) return;
+      if (ev.key === ' ' && /^(INPUT|TEXTAREA|SELECT|BUTTON|A)$/.test(ev.target.tagName)) return;
+      if (ev.key === 'ArrowDown' || ev.key === 'PageDown' || ev.key === ' ') { ev.preventDefault(); if (!held()) window.orbit.open(); }
+    });
+    route();
+    /* a page the browser keeps in memory and brings back (back button from another site) also starts again on home */
+    window.addEventListener('pageshow', function (ev) {
+      if (!ev.persisted) return;
+      stopSettle(); history.replaceState(null, '', location.pathname + location.search);
+      show('home', null, false, true); window.scrollTo(0, 0);
+    });
+  })();
+</script>
