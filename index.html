@@ -2,7 +2,7 @@
 <html lang="en">
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Zhengye Liao</title>
+<title>Zenyee Portfolio</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="description" content="Portfolio of Zhengye Liao, a product design student in Milan, with NEST, Vaporina, Majiroller, art projects and an archive of exercises.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1786,8 +1786,9 @@ img.loaded { opacity: 1; transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
         l.style.transition = 'transform 0.6s cubic-bezier(0.65, 0, 0.35, 1), color 0.6s'; l.style.transform = '';
       }
       if (push) {
-        var url = name === 'home' ? location.pathname + location.search : '#' + (el ? el.id : name);
-        try { history.pushState(null, '', url); } catch (err) {}
+        /* the page is kept in the history entry, not in the address, so the address always stays the bare site name */
+        var to = name === 'home' ? '' : '#' + (el ? el.id : name);
+        try { history.pushState({ to: to }, '', location.pathname + location.search); } catch (err) {}
       }
       /* hidden pages measured nothing; let every layout script measure again now this one is on screen */
       window.dispatchEvent(new Event('resize'));
@@ -1884,8 +1885,12 @@ img.loaded { opacity: 1; transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
       ev.preventDefault();
       if (a.dataset.nav && !calm) wipe(to.v, a); else { show(to.v, to.el, true); if (!to.el) settle(); }
     });
-    function route() { var to = find(location.hash); show(to.v, to.el, false); }
-    window.addEventListener('popstate', route); window.addEventListener('hashchange', route);
+    function route(ev) {
+      var to = find(ev && ev.state && typeof ev.state.to === 'string' ? ev.state.to : location.hash);
+      show(to.v, to.el, false);
+      if (location.hash) try { history.replaceState({ to: location.hash }, '', location.pathname + location.search); } catch (err) {}
+    }
+    window.addEventListener('popstate', route);
     /* after a page turn the page scrolls itself on until the title, in the white band under the picture, sits just under
        the menu bar (where it would start to fly up into the menu); any scroll or key of the visitor's own stops it */
     var auto = 0, autoOn = false;
