@@ -1518,7 +1518,12 @@ img.loaded { opacity: 1; transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
     face.className = 'twin'; face.setAttribute('aria-hidden', 'true');
     face.textContent = words.map(function (w) { return w.textContent; }).join(' ');
     face.style.fontVariationSettings = fv(100, 700);
-    set.appendChild(face);
+    /* the copy is one long line, wider than the screen: it sits in a box of no size that cuts it off, so the page
+       cannot be swiped sideways onto it; it is still measured at its full width */
+    var faceBox = document.createElement('span');
+    faceBox.setAttribute('aria-hidden', 'true');
+    faceBox.style.cssText = 'width:0;height:0;overflow:hidden;visibility:hidden';
+    faceBox.appendChild(face); set.appendChild(faceBox);
     var faceW = 0, rf;
     function refit() { var fw = face.getBoundingClientRect().width; if (!fw || Math.abs(fw - faceW) < 0.5) return; faceW = fw; clearTimeout(rf); rf = setTimeout(function () { measure(true); }, 60); }
     if ('ResizeObserver' in window) new ResizeObserver(refit).observe(face);
